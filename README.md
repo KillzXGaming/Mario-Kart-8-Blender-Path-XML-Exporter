@@ -1,6 +1,9 @@
 # Mario-Kart-8-Blender-Path-XML-Exporter
 This is a tool for exporting path data into a usable convertable XML format for yamlconv.
 
+
+# This tool is in beta! I do not advise using this until I release this in the releases section of this. Many things are not complete or simply not usable yet. 
+
 ## Supports:
 
 - Lap Paths
