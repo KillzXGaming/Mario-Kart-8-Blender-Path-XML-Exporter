@@ -2,48 +2,36 @@
 This is a tool for exporting path data into a usable convertable XML format for yamlconv.
 
 ## Supports:
-Lap Paths
 
-Gravity Paths
-
-Glide Paths
-
-Enemy Paths
-
-Return Points (normals and tangents too)
-
-Grouping paths (by blender layers)
+- Lap Paths
+- Gravity Paths
+- Glide Paths
+- Enemy Paths
+- Return Points (normals and tangents too)
+- Grouping paths (by blender layers)
 
 **Done but not added yet to addon:**
 
-GCamera
-
-Item Paths
-
-Replay Camera
-
-Intro Camera
+- GCamera
+- Item Paths
+- Replay Camera
+- Intro Camera
 
 **Not supported YET**
-Object Path (will be done by key frames)
 
+- Object Path (will be done by key frames)
 Pull paths
 
 
 **Todo**
--Create a good enough object to repesent enemy paths
 
--UI for path properties
-
--UI for auto selecting and hiding paths
-
--UI for converting path types to easily make paths. (Example, duplicate lap paths and convert to enemy paths to instantly make them or use as a base)
-
--Export object path via key frame data
-
--Viewable intro camera (possbily export off of keyframes too
-
--Override ID system with UI (For more than 2 groups to branch out to)
+- Create a good enough object to repesent enemy paths
+- UI for path properties
+- UI for auto selecting and hiding paths
+- UI for converting path types to easily make paths. (Example, duplicate lap paths and convert to enemy paths to instantly make them or use as a base)
+- Export object path via key frame data
+- Viewable intro camera (possbily export off of keyframes too
+- Override ID system with UI (For more than 2 groups to branch out to)
 
 
 
