@@ -1,2 +1,37 @@
 # Mario-Kart-8-Blender-Path-XML-Exporter
 This is a tool for exporting path data into a usable convertable XML format for yamlconv.
+
+How to use:
+
+-Open blender. Get the program here if you do not have it. 
+https://www.blender.org/download/
+
+Install by going to File - User Preferances - Add ons tab
+Click Install Add On by file at the bottom then click the zip. Check the add on to be active and Save User Settings
+
+-In the program use Shift + A to open a menu. This will have the "mesh" option on the top. 
+Select it and at the bottom choose your path type.
+
+Path types:
+	Lap Paths determine the boundries from one path to another where Latiku would grab the player. These work identical to how MKWII worked. 
+
+	Enemy Paths are simply points that enemy goes towards. 
+
+	Glider paths pull the player towards. The boxes represent how far you can glide on the side
+
+	Gravity paths are the boundries of anti gravity from one path to another. The first path enables anti gravoty, last one disables it.
+
+	Intro camera works as a path on where to move
+
+	Replay camera are points to view angles of where the player is moving or other things
+
+	Item Paths are simply points items go towards. Generally these can be the same as enemy ones
+
+	
+To start you will want to do two paths. A lap path, then an enemy path. Then work your way and do more.
+
+To group paths if they split or if you have multiple glider or gravity sections, press "M" key and add them to the next layer. 
+
+
+More details and specifics on this in a video tutorial
+
