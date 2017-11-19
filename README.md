@@ -81,7 +81,7 @@ More details and specifics on this in a video tutorial
 
 KillzXGaming - Worked on code for each path and setup a layout to work with yamklconv
 
-MasterVermilli0n - helped alot with the code
+AboodXD  - helped alot with the code
 
 Chadderz - yamlconv 
 
