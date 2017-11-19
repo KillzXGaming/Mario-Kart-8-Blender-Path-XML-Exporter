@@ -15,6 +15,7 @@ Return Points (normals and tangents too)
 Grouping paths (by blender layers)
 
 **Done but not added yet to addon:**
+
 GCamera
 
 Item Paths
