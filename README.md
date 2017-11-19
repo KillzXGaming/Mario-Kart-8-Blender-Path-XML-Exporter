@@ -1,6 +1,36 @@
 # Mario-Kart-8-Blender-Path-XML-Exporter
 This is a tool for exporting path data into a usable convertable XML format for yamlconv.
 
+## Supports:
+Lap Paths
+Gravity Paths
+Glide Paths
+Enemy Paths
+Return Points (normals and tangents too)
+Grouping paths (by blender layers)
+
+**Done but not added yet to addon:**
+GCamera
+Item Paths
+Replay Camera
+Intro Camera
+
+**Not supported YET**
+Object Path (will be done by key frames)
+Pull paths
+
+
+**Todo**
+-Create a good enough object to repesent enemy paths
+-UI for path properties
+-UI for auto selecting and hiding paths
+-UI for converting path types to easily make paths. (Example, duplicate lap paths and convert to enemy paths to instantly make them or use as a base)
+-Export object path via key frame data
+-Viewable intro camera (possbily export off of keyframes too
+-Override ID system with UI (For more than 2 groups to branch out to)
+
+
+
 ## How to use:
 
 
@@ -47,6 +77,8 @@ KillzXGaming - Worked on code for each path and setup a layout to work with yamk
 MasterVermilli0n - helped alot with the code
 
 Chadderz - yamlconv 
+
+Wexos - helping me figure out tangent and normal rotation values for return points
 
 Blender Team - Blender api stuff and basic templates to work off of. 
 
