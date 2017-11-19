@@ -61,20 +61,6 @@ def add_object(self, context):
     # mesh.validate(verbose=True)
     object_data_add(context, mesh, operator=self)
 
-class LayoutDemoPanel(bpy.types.Panel):
-    """Creates a Panel in the 3D views toolbar region"""
-    bl_label = 'Layout Demo'
-    bl_idname = 'SCENE_PT_layout_demo'
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
-	bl_category = 'Custom'
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        row = layout.row()
-        row.label('testing')
 
 			
 			
@@ -182,10 +168,7 @@ def register():
     bpy.types.INFO_MT_mesh_add.append(add_object_button)
     bpy.utils.register_class(ExportSomeData)
     bpy.types.INFO_MT_file_export.append(menu_func_export)
-    bpy.utils.register_class(MySettings)
-    bpy.utils.register_class(CustomPanel)
-    bpy.types.Scene.myprop = bpy.props.IntProperty(name="My Storage", default=2)
-    bpy.utils.register_class(LayoutDemoPanel)
+
 
     
 
@@ -196,10 +179,7 @@ def unregister():
     bpy.types.INFO_MT_mesh_add.remove(add_object_button)
     bpy.utils.unregister_class(ExportSomeData)
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
-    bpy.utils.unregister_class(MySettings)
-    bpy.utils.unregister_class(CustomPanel)
-    bpy.utils.unregister_class(LayoutDemoPanel)
-    del bpy.types.Scene.myprop
+
     
 
 
