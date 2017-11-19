@@ -5,7 +5,7 @@ This is a tool for exporting path data into a usable convertable XML format for 
 ## This tool is in beta! I do not advise using this until I release this in the releases section of this. Many things are not complete or simply not usable yet. 
 
 
-![Paths](https://i.imgur.com/RO6oETb.png)
+![Paths](https://i.imgur.com/900bQt0.png)
 
 
 
