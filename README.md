@@ -1,10 +1,10 @@
 # Mario-Kart-8-Blender-Path-XML-Exporter
 This is a tool for exporting path data into a usable convertable XML format for yamlconv.
 
-How to use:
+## How to use:
 
--Open blender. Get the program here if you do not have it. 
-https://www.blender.org/download/
+
+-Open blender. Get the program here if you do not have it. [blender](https://www.blender.org/download/)
 
 Install by going to File - User Preferances - Add ons tab
 Click Install Add On by file at the bottom then click the zip. Check the add on to be active and Save User Settings
@@ -12,7 +12,8 @@ Click Install Add On by file at the bottom then click the zip. Check the add on 
 -In the program use Shift + A to open a menu. This will have the "mesh" option on the top. 
 Select it and at the bottom choose your path type.
 
-Path types:
+## Path types:
+
 	Lap Paths determine the boundries from one path to another where Latiku would grab the player. These work identical to how MKWII worked. 
 
 	Enemy Paths are simply points that enemy goes towards. 
@@ -32,6 +33,20 @@ To start you will want to do two paths. A lap path, then an enemy path. Then wor
 
 To group paths if they split or if you have multiple glider or gravity sections, press "M" key and add them to the next layer. 
 
+Export with file - export and copy the contents of the XML over to a converted byaml with [yamlconv](https://github.com/Chadderz121/yamlconv)
+
+
 
 More details and specifics on this in a video tutorial
+
+
+## Credits:
+
+KillzXGaming - Worked on code for each path and setup a layout to work with yamklconv
+
+MasterVermilli0n - helped alot with the code
+
+Chadderz - yamlconv 
+
+Blender Team - Blender api stuff and basic templates to work off of. 
 
