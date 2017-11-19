@@ -20,7 +20,7 @@ This is a tool for exporting path data into a usable convertable XML format for 
 **Not supported YET**
 
 - Object Path (will be done by key frames)
-Pull paths
+- Pull paths
 
 
 **Todo**
