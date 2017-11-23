@@ -2,50 +2,8 @@ import bpy
 import mathutils
 import math
 import addon_add_object
-from bpy.props import (StringProperty,
-                       BoolProperty,
-                       IntProperty,
-                       FloatProperty,
-                       EnumProperty,
-                       PointerProperty,
-                       )
-from bpy.types import (Panel,
-                       AddonPreferences,
-                       PropertyGroup,
-                       )
+
  
-
-class MySettings(PropertyGroup):
-
-    my_bool = BoolProperty(
-        name="Enable or Disable",
-        description="A simple bool property",
-        default = False) 
-
-
-		
-		
-class CustomPanel(bpy.types.Panel):
-    """A Custom Panel in the Viewport Toolbar"""
-    bl_label = "LapPath"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = 'object'
-
-	
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        mytool = scene.my_tool
-		
-
-        layout.prop(mytool, "my_bool", text="Bool Property")
-
-
-        if (mytool.my_bool == True):
-            print ("Property Enabled")
-        else:
-            print ("Property Disabled")
 
 
 
@@ -283,9 +241,9 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('\n          </PrevPt>')
             #Scale paths as they are smaller for some reason
             if obj.type != 'EMPTY': 
-                 ScaleX = obj.scale.x * 2
-                 ScaleY = obj.scale.y * 2
-                 ScaleZ = obj.scale.z * 2
+                 ScaleX = obj.scale.x 
+                 ScaleY = obj.scale.y 
+                 ScaleZ = obj.scale.z 
             else:
                 ScaleX = obj.scale.x
                 ScaleY = obj.scale.y
@@ -370,6 +328,152 @@ def write_some_data(context, filepath, use_some_setting):
 	
     
 
+	
+	
+    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
+ 
+    # So now we will search for layers in the scene and group them!
+ 
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
+ 
+    layerIndecies = []
+ 
+    for layerIndex in range(20):  # loop from layer 0 to layer 19
+        selectedObjectsGCamera  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+ 
+        if selectedObjectsGCamera:
+            layerIndecies.append(layerIndex)
+        
+
+ 
+ 
+    for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
+        selectedObjectsGCamera  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+ 
+        # Write the start of lap path group
+		
+        if layerIndex == layerIndecies[0]:
+            f.write('\n  <GCameraPath type="array">')
+
+
+        if layerIndex != layerIndecies[0]:
+            f.write('    </value>')
+                    
+			
+			
+			
+        f.write('\n    <value UnitIdNum="26">')
+        f.write('\n      <PathPt type="array">\n')
+ 
+        for objID, obj in enumerate(selectedObjectsGCamera ):
+            f.write('        <value>\n')
+
+            if obj == selectedObjectsGCamera [-1]:
+                    f.write('          <NextPt type="array" />\n')
+            else:
+                    f.write('          <NextPt type="array">\n')
+
+ 
+            # Write next lap path group ID
+            if obj == selectedObjectsGCamera [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+            else:
+                    f.write('            <value PathId="')  # write the next group ID
+				
+            if obj == selectedObjectsGCamera [-1]:
+                if layerIndex == layerIndecies[-1]:
+                    f.write('')
+                else:
+                    f.write('%d' % (groupIndex + 1))
+            else:
+                f.write('%d' % groupIndex)
+ 
+            if obj == selectedObjectsGCamera [-1]:
+                    f.write('')
+					
+            # Write next lap path ID
+            if obj == selectedObjectsGCamera [-1]:
+                f.write('')  # Last Object does not loop so has no ID after
+            else:
+                f.write('" PtId="')
+ 
+            if obj == selectedObjectsGCamera [-1]:
+                f.write('')
+            else:
+                f.write('%d" />' % (objID + 1))
+ 
+            if obj == selectedObjectsGCamera [-1]:
+                f.write('')  # Last Object does not loop so has no ID after
+            else:
+                f.write('\n          </NextPt>\n')
+ 
+            # Write previous lap path group ID
+            if obj == selectedObjectsGCamera [0]:
+                    f.write('          <PrevPt type="array" />')
+            else:
+                    f.write('          <PrevPt type="array">')
+			
+            if obj == selectedObjectsGCamera [0]:
+                f.write('')  # Last Object does not loop so has no ID before
+            else:
+                f.write('\n            <value PathId="')  # write the next group ID
+ 
+            if obj == selectedObjectsGCamera [0]:
+                    f.write('')
+            else:
+                f.write('%d' % groupIndex)
+ 
+            # Write previous lap path ID
+            if obj == selectedObjectsGCamera [0]:
+                f.write('')  # Last Object does not loop so has no ID before
+            else:
+                f.write('" PtId="')
+ 
+            if obj == selectedObjectsGCamera [0]:
+                f.write('')
+            else:
+                f.write('%d" />' % (objID - 1))
+				
+				
+            if obj == selectedObjectsGCamera [0]:
+                f.write('')  # Last Object does not loop so has no ID before
+            else:
+                 f.write('\n          </PrevPt>')
+ 
+            zscale = round(obj.scale.z, 3)
+            yscale = round(obj.scale.y, 3)
+            xscale = round(obj.scale.x, 3)
+            XRot = round(obj.rotation_euler.x, 3)
+            ZRot = round(obj.rotation_euler.z, 3)
+            YRot = round(-obj.rotation_euler.y,
+                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            xloc = round(obj.location.x, 3)
+            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            zloc = round(obj.location.z, 3)
+ 
+            # Write Coordinates from lap paths selected
+            f.write('\n          <Rotate X="')
+            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+            f.write('\n          <Scale X="')
+            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
+            f.write('\n          <Translate X="')
+            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+            f.write('\n        </value>\n')
+ 
+        f.write('      </PathPt>\n')
+ 
+        if layerIndex != layerIndecies[0]:
+            f.write('')
+        else:
+            f.write('    </value>\n')
+            f.write('  </GCameraPath>')
+	
+	
+	
+	
+	
+	
+	
 
     
  
