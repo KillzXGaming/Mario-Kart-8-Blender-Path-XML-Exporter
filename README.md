@@ -12,7 +12,7 @@ This is a tool for exporting path data into a usable convertable XML format for 
 ## Supports:
 
 - Lap Paths
-- Gravity Paths
+- Gravity Paths (GCamera inlcuded)
 - Glide Paths
 - Enemy Paths
 - Return Points (normals and tangents too)
