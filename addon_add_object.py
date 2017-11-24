@@ -50,7 +50,10 @@ def common_update(self, context, origin):
                 ob.unhide = True
     else:
             ob.hide = False		    
-					   
+
+
+			
+			
 class gliderselect(bpy.types.Operator):
     bl_idname = "glider.select"
     bl_label = "glideselect"
@@ -109,14 +112,16 @@ class lapselect(bpy.types.Operator):
     bl_idname = "lap.select"
     bl_label = "lapselect"
 
- 
+
     def execute(self, context):	
         scene = context.scene
         		
         for ob in scene.objects:
             if ob.name.startswith("Lap"):
                 ob.select = True				   
-
+            if ob.select:
+                ob.data = mesh
+                bpy.context.object.name = bpy.context.object.name.replace("Lap", "Gravity")
 				
 				
 
@@ -534,7 +539,8 @@ def register():
     bpy.utils.register_class(introselect)
     bpy.utils.register_class(enemyselect)
     bpy.types.Scene.my_prop
-    
+    bpy.utils.register_class(Laptogravity)
+
 
 
 def unregister():
@@ -556,6 +562,7 @@ def unregister():
     bpy.utils.unregister_class(introselect)
     bpy.utils.unregister_class(enemyselect)
     del bpy.types.Scene.my_prop
+    bpy.utils.unregister_class(Laptogravity)
 
     
 
