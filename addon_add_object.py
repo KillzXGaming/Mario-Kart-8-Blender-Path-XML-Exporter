@@ -36,21 +36,190 @@ from bpy.types import (Panel,
                        PropertyGroup,
                        )
 
+				   
+					   
+# def HeadlightsToggle
+    # scene = bpy.context.scene
+    # unhide_objects()
+    # for ob in bpy.context.screen.scene.objects:
+        # if ob.name.startswith(str(scene.TestStringProp)):
+            # ob.hide = True
+        # else:
+            # ob.hide = False
+    # if not scene.TestBool:
+        # unhide_objects()
 
-def common_update(self, context, origin):
+# def initproplights():
+    # bpy.types.Scene.TestBool = bpy.props.BoolProperty(
+        # name="Hide", 
+        # description="", 
+        # default=False, 
+        # subtype='NONE', 
+        # update=HeadlightsToggle)
 
-    obj = context.object
-    scene = context.scene
+					   
+					   
 
-    for ob in scene.objects:
-        if (scene.my_prop == True):
-            if ob.name.startswith("Glide"):
+
+#Hide/Unhide Lap Paths
+def ToggleHide(self, context): 
+    scene = bpy.context.scene
+    if scene.TestStringProp: #Hide all paths if checked
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.TestStringProp)):
                 ob.hide = True
-            else:
-                ob.unhide = True
-    else:
-            ob.hide = False		    
+    if not scene.TestBool: #Unhide all paths if unchecked!
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.TestStringProp)):
+                ob.hide = False
 
+#Hide/Unhide Gravity Paths
+def ToggleHideGravity(self, context):
+    scene = bpy.context.scene
+    if scene.StringPropGravity: #Hide all paths if checked
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropGravity)):
+                ob.hide = True
+    if not scene.BoolGravity: #Unhide all paths if unchecked!
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropGravity)):
+                ob.hide = False
+
+#Hide/Unhide Enemy Paths				
+def ToggleHideEnemy(self, context):
+    scene = bpy.context.scene
+    if scene.StringPropEnemy: #Hide all paths if checked
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropEnemy)):
+                ob.hide = True
+    if not scene.BoolEnemy: #Unhide all paths if unchecked!
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropEnemy)):
+                ob.hide = False
+
+#Hide/Unhide Intro Camera Paths				
+def ToggleHideIntro(self, context):
+    scene = bpy.context.scene
+    if scene.StringPropIntro: #Hide all paths if checked
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropIntro)):
+                ob.hide = True
+    if not scene.BoolIntro: #Unhide all paths if unchecked!
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropIntro)):
+                ob.hide = False			
+	
+#Hide/Unhide Replay Camera Paths				
+def ToggleHideReplay(self, context):
+    scene = bpy.context.scene
+    if scene.StringPropReplay: #Hide all paths if checked
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropReplay)):
+                ob.hide = True
+    if not scene.BoolReplay: #Unhide all paths if unchecked!
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropReplay)):
+                ob.hide = False	
+	
+#Hide/Unhide Glider Paths				
+def ToggleHideGlide(self, context):
+    scene = bpy.context.scene
+    if scene.StringPropGlide: #Hide all paths if checked
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropGlide)):
+                ob.hide = True
+    if not scene.BoolGlide: #Unhide all paths if unchecked!
+        for ob in bpy.context.screen.scene.objects:
+            if ob.name.startswith(str(scene.StringPropGlide)):
+                ob.hide = False
+				
+def initprop():
+    bpy.types.Scene.TestBool = bpy.props.BoolProperty(
+        name="Hide Lap Paths", 
+        description="", 
+        default=False, 
+        subtype='NONE', 
+        update=ToggleHide)
+
+    bpy.types.Scene.TestStringProp = bpy.props.StringProperty(
+        name="TestStringProp", 
+        description="", 
+        default="Lap", 
+        subtype='NONE')
+
+    bpy.types.Scene.BoolGravity = bpy.props.BoolProperty(
+        name="Hide Gravity Paths", 
+        description="", 
+        default=False, 
+        subtype='NONE', 
+        update=ToggleHideGravity)
+
+    bpy.types.Scene.StringPropGravity = bpy.props.StringProperty(
+        name="StringPropGravity", 
+        description="", 
+        default="Gravity", 
+        subtype='NONE')	
+		
+    bpy.types.Scene.BoolEnemy = bpy.props.BoolProperty(
+        name="Hide Enemy Paths", 
+        description="", 
+        default=False, 
+        subtype='NONE', 
+        update=ToggleHideEnemy)
+
+    bpy.types.Scene.StringPropEnemy = bpy.props.StringProperty(
+        name="StringPropEnemy", 
+        description="", 
+        default="Enemy", 
+        subtype='NONE')	
+		
+    bpy.types.Scene.BoolGlide = bpy.props.BoolProperty(
+        name="Hide Glder Paths", 
+        description="", 
+        default=False, 
+        subtype='NONE', 
+        update=ToggleHideGlide)
+
+    bpy.types.Scene.StringPropGlide = bpy.props.StringProperty(
+        name="StringPropGlide", 
+        description="", 
+        default="Glide", 
+        subtype='NONE')
+		
+    bpy.types.Scene.BoolIntro = bpy.props.BoolProperty(
+        name="Hide Intro Camera Paths", 
+        description="", 
+        default=False, 
+        subtype='NONE', 
+        update=ToggleHideIntro)
+
+    bpy.types.Scene.StringPropIntro = bpy.props.StringProperty(
+        name="StringPropIntro", 
+        description="", 
+        default="Intro", 
+        subtype='NONE')	
+	
+    bpy.types.Scene.BoolReplay = bpy.props.BoolProperty(
+        name="Hide Replay Camera Paths", 
+        description="", 
+        default=False, 
+        subtype='NONE', 
+        update=ToggleHideReplay)
+
+    bpy.types.Scene.StringPropReplay = bpy.props.StringProperty(
+        name="StringPropReplay", 
+        description="", 
+        default="Replay", 
+        subtype='NONE')	
+
+
+def delprop():
+    del bpy.types.Scene.TestBool
+    del bpy.types.Scene.TestStringProp	    
+    del bpy.types.Scene.BoolGravity
+    del bpy.types.Scene.StringPropGravity	    
+    del bpy.types.Scene.BoolEnemy
+    del bpy.types.Scene.StringPropEnemy	
 
 			
 			
@@ -119,9 +288,7 @@ class lapselect(bpy.types.Operator):
         for ob in scene.objects:
             if ob.name.startswith("Lap"):
                 ob.select = True				   
-            if ob.select:
-                ob.data = mesh
-                bpy.context.object.name = bpy.context.object.name.replace("Lap", "Gravity")
+
 				
 				
 
@@ -179,12 +346,6 @@ class OBJECT_OT_HEMI(bpy.types.Operator):
 
 class MySettings(PropertyGroup):
 
-    bpy.types.Scene.my_prop = bpy.props.BoolProperty(update=lambda self, context: common_update(self, context, 'my_bool_one'))
-
-    def execute(self, context):	
-        scene = context.scene	
-	
-
 
 		
     bpy.types.Scene.my_enum = EnumProperty(
@@ -217,12 +378,12 @@ class ObjectPanel(bpy.types.Panel):
 		
         
 		
-class PathSETTINGS(Panel):
+class VIEW3D_PT_Blank1_Blank2(Panel):
     bl_idname = "OBJECT_PT_my_panel"
-    bl_label = "My Panel"
+    bl_label = "Mario Kart 8 Path Tools"
     bl_space_type = "VIEW_3D"   
     bl_region_type = "TOOLS"    
-    bl_category = "MK8"
+    bl_category = "Mario Kart 8"
 
 
 
@@ -230,7 +391,7 @@ class PathSETTINGS(Panel):
         obj = context.object
         layout = self.layout
         scene = context.scene
-        layout.label("First row")
+        layout.label("Path Selection")
         row = layout.row(align=True)
         row.alignment = 'EXPAND'
         row = layout.row()
@@ -255,12 +416,18 @@ class PathSETTINGS(Panel):
         row = layout.row()
        # row.operator("object.lamp_add(type='HEMI'), text="Add Hemisphere")
         row = layout.row()
-        row.prop(scene, "my_prop", text="Hide Object")
-        row = layout.row()
-        row = layout.row()
-        row.prop(scene, "my_enum")	
+        col = layout.column(align=True)
+        scn = bpy.context.scene
+        col.label(text="Path Toggle")
+        col.prop(scene, "TestBool")
+        col.prop(scene, "BoolEnemy")
+        col.prop(scene, "BoolGlide")
+        col.prop(scene, "BoolGravity")
+        col.prop(scene, "BoolIntro")
+        col.prop(scene, "BoolReplay")
 
-
+		
+		
 #Lap Paths
 def add_object(self, context):
 
@@ -531,16 +698,14 @@ def register():
     bpy.utils.register_class(OBJECT_OT_HEMI)
     bpy.utils.register_class(ObjectPanel)
     bpy.utils.register_class(MySettings)
-    bpy.utils.register_class(PathSETTINGS)
     bpy.utils.register_class(gliderselect)
     bpy.utils.register_class(gravityselect)
     bpy.utils.register_class(lapselect)
     bpy.utils.register_class(replayselect)
     bpy.utils.register_class(introselect)
     bpy.utils.register_class(enemyselect)
-    bpy.types.Scene.my_prop
-    bpy.utils.register_class(Laptogravity)
-
+    bpy.utils.register_class(VIEW3D_PT_Blank1_Blank2)
+    initprop()
 
 
 def unregister():
@@ -554,16 +719,14 @@ def unregister():
     bpy.utils.unregister_class(OBJECT_OT_HEMI)
     bpy.utils.unregister_class(ObjectPanel)
     bpy.utils.unregister_class(MySettings)
-    bpy.utils.unregister_class(PathSETTINGS)
     bpy.utils.unregister_class(gliderselect)
     bpy.utils.unregister_class(gravityselect)
     bpy.utils.unregister_class(lapselect)
     bpy.utils.unregister_class(replayselect)
     bpy.utils.unregister_class(introselect)
     bpy.utils.unregister_class(enemyselect)
-    del bpy.types.Scene.my_prop
-    bpy.utils.unregister_class(Laptogravity)
-
+    bpy.utils.unregister_class(VIEW3D_PT_Blank1_Blank2)
+    delprop()
     
 
 
