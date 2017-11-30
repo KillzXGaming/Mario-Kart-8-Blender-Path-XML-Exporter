@@ -183,16 +183,17 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('\n      <PathPt type="array">\n')
  
  
-        headlights = "false"
- 
+		
+        scene = context.scene
+		
         for objID, obj in enumerate(selectedObjects):
             if obj == selectedObjects[0]:
                 if layerIndex == layerIndecies[0]:
-                  f.write('        <value CheckPoint="-1" ClipIdx="-1" HeadLightSW="' + str(headlights) + '" LapCheck="0" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="-1" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
                 else:
-                  f.write('        <value CheckPoint="-1" ClipIdx="-1" HeadLightSW="' + str(headlights) + '" LapCheck="-1" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="-1" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
             else:
-                  f.write('        <value CheckPoint="-1" ClipIdx="-1" HeadLightSW="' + str(headlights) + '" LapCheck="-1" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="-1" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
  
             f.write('\n          <NextPt type="array">\n')
  

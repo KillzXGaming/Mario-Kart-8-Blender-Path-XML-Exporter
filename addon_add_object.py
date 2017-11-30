@@ -23,6 +23,8 @@ from bpy_extras.object_utils import AddObjectHelper, object_data_add
 from mathutils import Vector
 from bl_operators.presets import AddPresetBase
 from MK8_export_paths import *
+# import idproperty
+
 
 from bpy.props import (StringProperty,
                        BoolProperty,
@@ -36,7 +38,7 @@ from bpy.types import (Panel,
                        PropertyGroup,
                        )
 
-				   
+
 					   
 # def HeadlightsToggle
     # scene = bpy.context.scene
@@ -56,9 +58,6 @@ from bpy.types import (Panel,
         # default=False, 
         # subtype='NONE', 
         # update=HeadlightsToggle)
-
-					   
-					   
 
 
 #Hide/Unhide Lap Paths
@@ -132,7 +131,10 @@ def ToggleHideGlide(self, context):
         for ob in bpy.context.screen.scene.objects:
             if ob.name.startswith(str(scene.StringPropGlide)):
                 ob.hide = False
-				
+	
+
+
+	
 def initprop():
     bpy.types.Scene.TestBool = bpy.props.BoolProperty(
         name="Hide Lap Paths", 
@@ -211,6 +213,33 @@ def initprop():
         description="", 
         default="Replay", 
         subtype='NONE')	
+		
+		
+    bpy.types.Object.IntCheckpoint = bpy.props.IntProperty(
+	name="Check Point",
+	description="Checkpoints to prevent skipping paths to count a lap",
+	min=-1, max=99999,
+	default=-1)
+
+    bpy.types.Object.IntLapCheck = bpy.props.IntProperty(
+	name="Lap Check",
+	description="Counts a lap passed. Looped track uses 0 for first path!",
+	min=-1, max=7,
+	default=-1)
+
+    bpy.types.Object.IntClipIndx = bpy.props.IntProperty(
+	name="Clip Index",
+	description="Clip index used for culling (NOT DONE)",
+	min=-1, max=99999,
+	default=-1)
+
+    bpy.types.Object.HeadlightsEnum = EnumProperty(
+        name="Dropdown:",
+        description="Apply Data to attribute.",
+        items=[ ('False', "Headlights Off", ""),
+                ('True', "Headlights On", ""),
+               ]
+        )
 
 
 def delprop():
@@ -220,6 +249,15 @@ def delprop():
     del bpy.types.Scene.StringPropGravity	    
     del bpy.types.Scene.BoolEnemy
     del bpy.types.Scene.StringPropEnemy	
+    del bpy.types.Scene.BoolGlide
+    del bpy.types.Scene.StringPropGlide	
+    del bpy.types.Scene.BoolIntro
+    del bpy.types.Scene.StringPropIntro
+    del bpy.types.Scene.BoolReplay
+    del bpy.types.Scene.StringPropReplay
+    del bpy.types.bpy.types.Object.HeadlightsEnum
+    del bpy.types.Object.IntCheckpoint
+    del bpy.types.Object.IntLapCheck
 
 			
 			
@@ -344,22 +382,36 @@ class OBJECT_OT_HEMI(bpy.types.Operator):
 
         return{'FINISHED'}
 
-class MySettings(PropertyGroup):
+
+class LaptoGravity(bpy.types.Operator):
+    bl_idname = "lap.gravity"
+    bl_label = "LaptoGravity"
+
+ 
+    def execute(self, context):	
 
 
-		
-    bpy.types.Scene.my_enum = EnumProperty(
-        name="Dropdown:",
-        description="Apply Data to attribute.",
-        items=[ ('OP1', "Headlights Off", ""),
-                ('OP2', "Headlights On", ""),
-               ]
-        )
 
-		
+        
+        
+        selected_objects = sorted(bpy.context.selected_objects, key=lambda obj: obj.name)
+
+        for ob in context.selected_objects:
+            if ob.name.startswith("Lap"):
+                bpy.ops.object.duplicate(linked=True)
+                bpy.ops.mesh.add_gravity() #Adds a temporary gravity path for replacing
+                mesh = bpy.data.meshes["Gravity Path"]
+                context.object.name = "TEMP"
+                ob.data = mesh
+                ob.name = ob.name.replace("Lap", "Gravity")
+				
+                objs = bpy.data.objects
+                objs.remove(objs["TEMP"], True) #Removes a temporary gravity path for replacing
+                              
+        return {'FINISHED'} 
 		
 class ObjectPanel(bpy.types.Panel):
-    bl_label = "Hello from Object context"
+    bl_label = "MK8 Path Settings"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "object"
@@ -368,14 +420,29 @@ class ObjectPanel(bpy.types.Panel):
         scene = context.scene
         obj = context.object
         layout = self.layout
-        layout.label("First row")
+        layout.label("Path Settings")
+        # ob = ctx.object
+        # idproperty.layout_id_prop(row, ob, "some_related_object")
         row = layout.row(align=True)
         row.alignment = 'EXPAND'
         row.label(text="Active object is: " + obj.name)
         row = layout.row()
         row = layout.row()
-        row.operator("object.lamp_add" , text="Add Lamp", icon='LAMP_AREA')
-		
+        col = layout.column(align=True)
+        scn = bpy.context.scene
+        col.scale_y = 1.5
+        if context.object.name.startswith("Lap"):
+            col.prop(obj, "HeadlightsEnum")
+        col = layout.column(align=True)
+        col = layout.column(align=True)
+        col.scale_y = 1.5
+        if context.object.name.startswith("Lap"):
+            col.prop(obj, "IntCheckpoint")
+            row = layout.row()
+        if context.object.name.startswith("Lap"):
+            col.prop(obj, "IntLapCheck")
+        col = layout.column(align=True)
+
         
 		
 class VIEW3D_PT_Blank1_Blank2(Panel):
@@ -414,6 +481,9 @@ class VIEW3D_PT_Blank1_Blank2(Panel):
         row.scale_y = 1.5
         row.operator("replay.select" , text="Select Replay Camera Paths")
         row = layout.row()
+        row.scale_y = 1.5
+        row.operator("lap.gravity" , text="Lap2Gravity")
+        row = layout.row()
        # row.operator("object.lamp_add(type='HEMI'), text="Add Hemisphere")
         row = layout.row()
         col = layout.column(align=True)
@@ -432,29 +502,41 @@ class VIEW3D_PT_Blank1_Blank2(Panel):
 def add_object(self, context):
 
 
-    verts = [Vector((-0.25, 0.0, -0.25)), Vector((-0.25, 0.0, 0.25)), Vector((0.25, 0.0, -0.25)), Vector((0.25, 0.0, 0.25)), Vector((-0.25, 0.0024999999441206455, -0.25)), Vector((-0.25, 0.0024999999441206455, 0.25)), Vector((0.25, 0.0024999999441206455, -0.25)), Vector((0.25, 0.0024999999441206455, 0.25)), Vector((0.009097770787775517, 0.037538301199674606, -0.011082690209150314)), Vector((0.009097770787775517, 0.037538301199674606, 0.008303677663207054)), Vector((0.010442008264362812, 0.0007872602436691523, -0.012137915939092636)), Vector((0.010442008264362812, 0.0007872602436691523, 0.009358905255794525)), Vector((-0.007850013673305511, 0.03718690574169159, -0.011082690209150314)), Vector((-0.007850013673305511, 0.03718690574169159, 0.008303677663207054)), Vector((-0.008350776508450508, 0.00039761816151440144, -0.012137915939092636)), Vector((-0.008350776508450508, 0.00039761816151440144, 0.009358905255794525)), Vector((0.01586453802883625, 0.03408169001340866, -0.018775926902890205)), Vector((0.01586453802883625, 0.03408169001340866, 0.015996914356946945)), Vector((-0.01453429739922285, 0.033451423048973083, 0.015996914356946945)), Vector((-0.01453429739922285, 0.033451423048973083, -0.018775926902890205)), Vector((0.0018669702112674713, 0.07865209132432938, -0.003352719359099865)), Vector((0.0018669702112674713, 0.07865209132432938, 0.0005737065803259611)), Vector((-0.001565549522638321, 0.07858095318078995, 0.0005737065803259611)), Vector((-0.001565549522638321, 0.07858095318078995, -0.003352719359099865))]
+    verts = [Vector((-1.0, 0, -1.0)),
+             Vector((-1.0, 0, 1.0)), 
+             Vector((1.0, 0, -1.0)), 
+             Vector((1.0, 0, 1.0)), 
+             Vector((-1.0, 0.01, -1.0)), 
+             Vector((-1.0, 0.01, 1.0)), 
+             Vector((1.0, 0.01, -1.0)), 
+             Vector((1.0, 0.01, 1.0))]
     
-	
-	
     edges = []
-    faces = [[2, 3, 1, 0], [6, 7, 5, 4], [7, 3, 1, 5], [8, 9, 11, 10], [10, 11, 15, 14], [14, 15, 13, 12], [12, 13, 18, 19], [10, 14, 12, 8], [15, 11, 9, 13], [16, 19, 23, 20], [9, 8, 16, 17], [8, 12, 19, 16], [13, 9, 17, 18], [23, 22, 21, 20], [17, 16, 20, 21], [18, 17, 21, 22], [19, 18, 22, 23]]
-
+    faces = [(2, 3, 1, 0), (6, 7, 5, 4), (7, 3, 1, 5)]
+	
     mesh = bpy.data.meshes.new(name="Lap Path")
     mesh.from_pydata(verts, edges, faces)
     # useful for development when the mesh may be invalid.
     # mesh.validate(verbose=True)
     object_data_add(context, mesh, operator=self)
 
+
+	
 #Gravity Paths
 def add_object1(self, context):
 
 
-    verts = [Vector((-0.25, 0.0, -0.25)), Vector((-0.25, 0.0, 0.25)), Vector((0.25, 0.0, -0.25)), Vector((0.25, 0.0, 0.25)), Vector((-0.25, 0.0024999999441206455, -0.25)), Vector((-0.25, 0.0024999999441206455, 0.25)), Vector((0.25, 0.0024999999441206455, -0.25)), Vector((0.25, 0.0024999999441206455, 0.25)), Vector((0.009097770787775517, 0.037538301199674606, -0.011082690209150314)), Vector((0.009097770787775517, 0.037538301199674606, 0.008303677663207054)), Vector((0.010442008264362812, 0.0007872602436691523, -0.012137915939092636)), Vector((0.010442008264362812, 0.0007872602436691523, 0.009358905255794525)), Vector((-0.007850013673305511, 0.03718690574169159, -0.011082690209150314)), Vector((-0.007850013673305511, 0.03718690574169159, 0.008303677663207054)), Vector((-0.008350776508450508, 0.00039761816151440144, -0.012137915939092636)), Vector((-0.008350776508450508, 0.00039761816151440144, 0.009358905255794525)), Vector((0.01586453802883625, 0.03408169001340866, -0.018775926902890205)), Vector((0.01586453802883625, 0.03408169001340866, 0.015996914356946945)), Vector((-0.01453429739922285, 0.033451423048973083, 0.015996914356946945)), Vector((-0.01453429739922285, 0.033451423048973083, -0.018775926902890205)), Vector((0.0018669702112674713, 0.07865209132432938, -0.003352719359099865)), Vector((0.0018669702112674713, 0.07865209132432938, 0.0005737065803259611)), Vector((-0.001565549522638321, 0.07858095318078995, 0.0005737065803259611)), Vector((-0.001565549522638321, 0.07858095318078995, -0.003352719359099865))]
+    verts = [Vector((-1.0, 0, -1.0)),
+             Vector((-1.0, 0, 1.0)), 
+             Vector((1.0, 0, -1.0)), 
+             Vector((1.0, 0, 1.0)), 
+             Vector((-1.0, 0.01, -1.0)), 
+             Vector((-1.0, 0.01, 1.0)), 
+             Vector((1.0, 0.01, -1.0)), 
+             Vector((1.0, 0.01, 1.0))]
     
-	
-	
     edges = []
-    faces = [[2, 3, 1, 0], [6, 7, 5, 4], [7, 3, 1, 5], [8, 9, 11, 10], [10, 11, 15, 14], [14, 15, 13, 12], [12, 13, 18, 19], [10, 14, 12, 8], [15, 11, 9, 13], [16, 19, 23, 20], [9, 8, 16, 17], [8, 12, 19, 16], [13, 9, 17, 18], [23, 22, 21, 20], [17, 16, 20, 21], [18, 17, 21, 22], [19, 18, 22, 23]]
+    faces = [(2, 3, 1, 0), (6, 7, 5, 4), (7, 3, 1, 5)]
 
     mesh = bpy.data.meshes.new(name="Gravity Path")
     mesh.from_pydata(verts, edges, faces)
@@ -523,6 +605,7 @@ class Add_LapPath(Operator, AddObjectHelper):
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
 		
+
         
 
     
@@ -640,7 +723,6 @@ class Add_GlidePath(Operator, AddObjectHelper):
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
         
-        bpy.ops.transform.resize(value=(0.25, 0.25, 0.25))
     
         return {'FINISHED'}	
 
@@ -679,53 +761,25 @@ def add_object_manual_map():
     return url_manual_prefix, url_manual_mapping
 
 
-# Only needed if you want to add into a dynamic menu
-def menu_func_export(self, context):
-    self.layout.operator(ExportSomeData.bl_idname, text="Mario Kart 8 XML Path Exporter")
-
 	
 	
 def register():
-
-
-    bpy.utils.register_class(Add_LapPath)
+    bpy.utils.register_module(__name__)
     bpy.utils.register_manual_map(add_object_manual_map)
     bpy.types.INFO_MT_mesh_add.append(add_object_button)
     bpy.utils.register_class(ExportSomeData)
     bpy.types.INFO_MT_file_export.append(menu_func_export)
-    bpy.utils.register_class(Add_GravityPath)
-    bpy.utils.register_class(Add_GlidePath)
-    bpy.utils.register_class(OBJECT_OT_HEMI)
-    bpy.utils.register_class(ObjectPanel)
-    bpy.utils.register_class(MySettings)
-    bpy.utils.register_class(gliderselect)
-    bpy.utils.register_class(gravityselect)
-    bpy.utils.register_class(lapselect)
-    bpy.utils.register_class(replayselect)
-    bpy.utils.register_class(introselect)
-    bpy.utils.register_class(enemyselect)
-    bpy.utils.register_class(VIEW3D_PT_Blank1_Blank2)
+    # bpy.types.Object.some_related_object = idproperty.ObjectIDProperty(name="something related")
     initprop()
 
 
 def unregister():
-    bpy.utils.unregister_class(Add_LapPath)
+    bpy.utils.unregister_module(__name__)
     bpy.utils.unregister_manual_map(add_object_manual_map)
     bpy.types.INFO_MT_mesh_add.remove(add_object_button)
     bpy.utils.unregister_class(ExportSomeData)
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
-    bpy.utils.unregister_class(Add_GravityPath)
-    bpy.utils.unregister_class(Add_GlidePath)
-    bpy.utils.unregister_class(OBJECT_OT_HEMI)
-    bpy.utils.unregister_class(ObjectPanel)
-    bpy.utils.unregister_class(MySettings)
-    bpy.utils.unregister_class(gliderselect)
-    bpy.utils.unregister_class(gravityselect)
-    bpy.utils.unregister_class(lapselect)
-    bpy.utils.unregister_class(replayselect)
-    bpy.utils.unregister_class(introselect)
-    bpy.utils.unregister_class(enemyselect)
-    bpy.utils.unregister_class(VIEW3D_PT_Blank1_Blank2)
+    # del bpy.types.Object.some_related_object
     delprop()
     
 
@@ -733,4 +787,6 @@ def unregister():
 if __name__ == "__main__":
     register()
 
+	
+	
 
