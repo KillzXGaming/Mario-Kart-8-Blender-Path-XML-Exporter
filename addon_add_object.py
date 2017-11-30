@@ -214,7 +214,8 @@ def initprop():
         default="Replay", 
         subtype='NONE')	
 		
-		
+	#props of lap path flags
+
     bpy.types.Object.IntCheckpoint = bpy.props.IntProperty(
 	name="Check Point",
 	description="Checkpoints to prevent skipping paths to count a lap",
@@ -233,15 +234,295 @@ def initprop():
 	min=-1, max=99999,
 	default=-1)
 
+    bpy.types.Object.IntReturnPosition = bpy.props.IntProperty(
+	name="Return Position",
+	description="Index for Return Posiion",
+	min=-1, max=99999,
+	default=-1)
+	
+    bpy.types.Object.IntSoundSW = bpy.props.IntProperty(
+	name="SoundSW Index",
+	description="Index for SoundSW",
+	min=-1, max=99999,
+	default=-1)
+	
+    bpy.types.Object.IntMapCameraY = bpy.props.IntProperty(
+	name="Map Camera Y axis",
+	description="Map Camera Y axis",
+	min=0, max=99999,
+	default=320)
+	
+    bpy.types.Object.IntMapCameraFovy = bpy.props.IntProperty(
+	name="Map Camera Fov on Y Axis",
+	description="Map Camera Fov on Y Axis",
+	min=-0, max=120,
+	default=65)
+	
     bpy.types.Object.HeadlightsEnum = EnumProperty(
-        name="Dropdown:",
+        name="",
         description="Apply Data to attribute.",
         items=[ ('False', "Headlights Off", ""),
                 ('True', "Headlights On", ""),
                ]
         )
+	#props of gravity path flags
 
+    bpy.types.Object.IntCameraHeight = bpy.props.IntProperty(
+	name="Camera Height",
+	description="Height of Anti Gravity Camera",
+	min=1, max=5,
+	default=1)
+		
+    bpy.types.Object.GlideOnlyEnum = EnumProperty(
+        name="",
+        description="Only enable anti gravity if gliding",
+        items=[ ('False', "Do not only active while gliding", ""),
+                ('True', "Active only while gliding", ""),
+               ]
+        )	
 
+    bpy.types.Object.GTransformEnum = EnumProperty(
+        name="",
+        description="Enable the anti gravity tranformation or disable. This is generally on true",
+        items=[ ('True', "Transform", ""),
+                ('False', "Do not transform", ""),
+               ]
+        )	
+	#props of glider path flags
+		
+    bpy.types.Object.CannonEnum = EnumProperty(
+        name="",
+        description="Enable/disable cannon where you are shot in a direction. Last glider path is often false!",
+        items=[ ('False', "Cannon Disabled", ""),
+                ('True', "Cannon Enabled", ""),
+               ]
+        )	
+
+	#props of enemy path flags
+		
+    bpy.types.Object.PriorityEnum = EnumProperty(
+        name="",
+        description="Determinie item necessary to use path",
+        items=[ ('1', "No item Needed", ""),
+                ('2', "Mushroom Needed", ""),
+               ]
+        )	
+		
+    bpy.types.Object.IntPathDir = bpy.props.IntProperty(
+	name="Path Directory",
+	description="IDK what this does",
+	min=1, max=5,
+	default=1)
+	
+    bpy.types.Object.IntBattleFlag = bpy.props.IntProperty(
+	name="Battle Flag",
+	description="IDK what this does",
+	min=1, max=5,
+	default=1)
+	
+	#props of item path flags
+	
+    bpy.types.Object.HoverEnum = EnumProperty(
+        name="",
+        description="Determinie hover???",
+        items=[ ('0', "No hover", ""),
+                ('1', "IDK", ""),
+                ('2', "IDK", ""),
+               ]
+        )
+		
+    bpy.types.Object.ItemPriorityEnum = EnumProperty(
+        name="",
+        description="Determinie item for some reason???",
+        items=[ ('1', "No item", ""),
+                ('2', "Mushroom", ""),
+               ]
+        )	
+		
+    bpy.types.Object.SearchAreaEnum = EnumProperty(
+        name="",
+        description="IDK",
+        items=[ ('0', "Do not search area", ""),
+                ('1', "IDK", ""),
+                ('2', "IDK", ""),
+               ]
+        )	
+		
+    #Replay Camera
+    bpy.types.Object.AutoFovyEnumReplay = EnumProperty(
+        name="",
+        description="Enable/disable auto fov on y axis",
+        items=[ ('False', "No Auto Fov on Y axis", ""),
+                ('True', "Auto Fov on Y axis", ""),
+               ]
+        )
+
+    bpy.types.Object.CameraTypeEnumReplay = EnumProperty(
+        name="",
+        description="Type of camera",
+        items=[ ('0', "Default camera type", ""),
+                ('1', "IDK", ""),
+                ('2', "IDK", ""),
+               ]
+        )
+		
+    bpy.types.Object.FollowEnumReplay = EnumProperty(
+        name="",
+        description="Follow player",
+        items=[ ('False', "Do not follow player", ""),
+                ('True', "Follow player", ""),
+               ]
+        )
+	
+    bpy.types.Object.IntAngleXReplay = bpy.props.IntProperty(
+	name="Angle X axis",
+	description="",
+	min=-180, max=180,
+	default=0)
+	
+    bpy.types.Object.IntAngleYReplay = bpy.props.IntProperty(
+	name="Angle Y axis",
+	description="",
+	min=-180, max=180,
+	default=0)
+	
+    bpy.types.Object.IntCamera_PathReplay = bpy.props.IntProperty(
+	name="Camera Path",
+	description="",
+	min=-1, max=60,
+	default=-1)
+	
+    bpy.types.Object.IntDepthOfFieldReplay = bpy.props.IntProperty(
+	name="Depth Of Field",
+	description="",
+	min=-0, max=45,
+	default=0)
+	
+    bpy.types.Object.IntDistanceReplay = bpy.props.IntProperty(
+	name="Distance",
+	description="",
+	min=-0, max=45,
+	default=0)
+
+    bpy.types.Object.IntFovyReplay = bpy.props.IntProperty(
+	name="Fov Y axis",
+	description="",
+	min=0, max=90,
+	default=45)
+	
+    bpy.types.Object.IntFovy2Replay = bpy.props.IntProperty(
+	name="Fov Y2 axis",
+	description="",
+	min=0, max=90,
+	default=15)
+	
+    bpy.types.Object.IntFovySpeedReplay = bpy.props.IntProperty(
+	name="Fovy speed",
+	description="",
+	min=0, max=25,
+	default=20)
+	
+    bpy.types.Object.IntGroupReplay = bpy.props.IntProperty(
+	name="Group",
+	description="",
+	min=0, max=10,
+	default=0)
+	
+    bpy.types.Object.IntPitchReplay = bpy.props.IntProperty(
+	name="Pitch",
+	description="",
+	min=-90, max=-90,
+	default=0)
+	
+    bpy.types.Object.IntRollReplay = bpy.props.IntProperty(
+	name="Roll",
+	description="",
+	min=-90, max=-90,
+	default=0)
+	
+    bpy.types.Object.IntUnitIdNumReplay = bpy.props.IntProperty(
+	name="UnitIdNum",
+	description="",
+	min=-131000, max=-131120,
+	default=131096)
+	
+    bpy.types.Object.IntYawReplay = bpy.props.IntProperty(
+	name="Yaw",
+	description="",
+	min=-90, max=-90,
+	default=0)
+	
+    bpy.types.Object.Intprm1Replay = bpy.props.IntProperty(
+	name="prm1",
+	description="",
+	min=0, max=99,
+	default=0)
+	
+    bpy.types.Object.Intprm2Replay = bpy.props.IntProperty(
+	name="prm2",
+	description="",
+	min=0, max=99,
+	default=0)
+	
+	
+    #Intro Camera
+
+    bpy.types.Object.FollowCameraTypeIntro =  EnumProperty(
+        name="",
+        description="Camera Type",
+        items=[ ('6', "Default Camera type", ""),
+                ('6', "Default Camera type", ""),
+               ]
+        )
+	
+    bpy.types.Object.IntCameraNumIntro = bpy.props.IntProperty(
+	name="Camera Number",
+	description="",
+	min=1, max=3,
+	default=1)
+	
+    bpy.types.Object.IntCameraTimeIntro = bpy.props.IntProperty(
+	name="Camera Time",
+	description="",
+	min=0, max=600,
+	default=200)
+	
+    bpy.types.Object.IntCamera_AtPathIntro = bpy.props.IntProperty(
+	name="Camera_AtPath",
+	description="",
+	min=-1, max=30,
+	default=-1)
+	
+    bpy.types.Object.IntCamera_PathIntro = bpy.props.IntProperty(
+	name="Camera_Path",
+	description="",
+	min=-1, max=30,
+	default=-1)
+	
+    bpy.types.Object.IntFovyIntro = bpy.props.IntProperty(
+	name="Fov Y axis",
+	description="",
+	min=0, max=90,
+	default=45)
+	
+    bpy.types.Object.IntFovy2Intro = bpy.props.IntProperty(
+	name="Fov Y2 axis",
+	description="",
+	min=0, max=90,
+	default=15)
+	
+    bpy.types.Object.IntFovySpeedIntro = bpy.props.IntProperty(
+	name="Fovy speed",
+	description="",
+	min=0, max=25,
+	default=20)
+	
+    bpy.types.Object.IntUnitIdNumIntro = bpy.props.IntProperty(
+	name="UnitIdNum",
+	description="",
+	min=-131000, max=-131120,
+	default=131096)
+	
 def delprop():
     del bpy.types.Scene.TestBool
     del bpy.types.Scene.TestStringProp	    
@@ -255,12 +536,61 @@ def delprop():
     del bpy.types.Scene.StringPropIntro
     del bpy.types.Scene.BoolReplay
     del bpy.types.Scene.StringPropReplay
+	#Deletion of lap path flags
     del bpy.types.bpy.types.Object.HeadlightsEnum
     del bpy.types.Object.IntCheckpoint
     del bpy.types.Object.IntLapCheck
+    del bpy.types.Object.IntReturnPosition
+    del bpy.types.Object.IntClipIndx
+    del bpy.types.Object.IntSoundSW
+    del bpy.types.Object.IntMapCameraY
+    del bpy.types.Object.IntMapCameraFovy
+	#Deletion of gravity path flags
+    del bpy.types.Object.IntCameraHeight
+    del bpy.types.Object.GlideOnlyEnum
+    del bpy.types.Object.GTransformEnum
+	#Deletion of glider path flags
+    del bpy.types.Object.CannonEnum
+	#Deletion of enemy path flags
+    del bpy.types.Object.PriorityEnum
+    del bpy.types.Object.IntPathDir
+    del bpy.types.Object.IntBattleFlag
+	#Deletion of item path flags
+    del bpy.types.Object.HoverEnum
+    del bpy.types.Object.ItemPriorityEnum
+    del bpy.types.Object.SearchAreaEnum
+	#Deletion of replay path flags
+    del bpy.types.Object.AutoFovyEnumReplay
+    del bpy.types.Object.CameraTypeEnumReplay
+    del bpy.types.Object.FollowEnumReplay
+    del bpy.types.Object.IntAngleXReplay
+    del bpy.types.Object.IntAngleYReplay
+    del bpy.types.Object.IntCamera_PathReplay
+    del bpy.types.Object.IntDepthOfFieldReplay
+    del bpy.types.Object.IntDistanceReplay
+    del bpy.types.Object.IntFovyReplay
+    del bpy.types.Object.IntFovy2Replay
+    del bpy.types.Object.IntFovySpeedReplay
+    del bpy.types.Object.IntGroupReplay
+    del bpy.types.Object.IntPitchReplay
+    del bpy.types.Object.IntRollReplay
+    del bpy.types.Object.IntUnitIdNumReplay
+    del bpy.types.Object.IntYawReplay
+    del bpy.types.Object.Intprm1Replay
+    del bpy.types.Object.Intprm2Replay	
+	#Deletion of intro path flags
+    del bpy.types.Object.FollowCameraTypeIntro
+    del bpy.types.Object.IntCameraNumIntro
+    del bpy.types.Object.IntCameraTimeIntro
+    del bpy.types.Object.IntCamera_AtPathIntro
+    del bpy.types.Object.IntCamera_PathIntro
+    del bpy.types.Object.IntFovyIntro
+    del bpy.types.Object.IntFovy2Intro
+    del bpy.types.Object.IntFovySpeedIntro
+    del bpy.types.Object.IntUnitIdNumIntro
 
-			
-			
+
+	
 class gliderselect(bpy.types.Operator):
     bl_idname = "glider.select"
     bl_label = "glideselect"
@@ -430,7 +760,7 @@ class ObjectPanel(bpy.types.Panel):
         row = layout.row()
         col = layout.column(align=True)
         scn = bpy.context.scene
-        col.scale_y = 1.5
+        col.scale_y = 2
         if context.object.name.startswith("Lap"):
             col.prop(obj, "HeadlightsEnum")
         col = layout.column(align=True)
@@ -439,11 +769,59 @@ class ObjectPanel(bpy.types.Panel):
         if context.object.name.startswith("Lap"):
             col.prop(obj, "IntCheckpoint")
             row = layout.row()
-        if context.object.name.startswith("Lap"):
             col.prop(obj, "IntLapCheck")
-        col = layout.column(align=True)
+            col.prop(obj, "IntReturnPosition")
+            col.prop(obj, "IntSoundSW")
+            col.prop(obj, "IntMapCameraY")
+            col.prop(obj, "IntMapCameraFovy")
+            col.prop(obj, "IntClipIndx")
+        if context.object.name.startswith("Gravity"):
+            col.prop(obj, "GlideOnlyEnum")
+            col.prop(obj, "GTransformEnum")
+            col.scale_y = 1.5
+            col.prop(obj, "IntCameraHeight")
+        if context.object.name.startswith("Glide"):
+            col.prop(obj, "CannonEnum")
+        if context.object.name.startswith("Enemy"):
+            col.prop(obj, "PriorityEnum")
+            col.prop(obj, "IntPathDir")
+            col.prop(obj, "IntBattleFlag")	
+        if context.object.name.startswith("Item"):
+            col.prop(obj, "HoverEnum")
+            col.prop(obj, "ItemPriorityEnum")
+            col.prop(obj, "SearchAreaEnum")	
+        if context.object.name.startswith("Replay"):
+            col.prop(obj, "AutoFovyEnumReplay")
+            col.prop(obj, "CameraTypeEnumReplay")
+            col.prop(obj, "FollowEnumReplay")	
+            col.prop(obj, "IntAngleXReplay")
+            col.prop(obj, "IntAngleYReplay")	
+            col.prop(obj, "IntCamera_PathReplay")
+            col.prop(obj, "IntDepthOfFieldReplay")
+            col.prop(obj, "IntDistanceReplay")
+            col.prop(obj, "IntFovyReplay")	
+            col.prop(obj, "IntFovy2Replay")	
+            col.prop(obj, "IntFovySpeedReplay")
+            col.prop(obj, "IntPitchReplay")
+            col.prop(obj, "IntGroupReplay")
+            col.prop(obj, "IntRollReplay")	
+            col.prop(obj, "IntYawReplay")	
+            col.prop(obj, "Intprm1Replay")
+            col.prop(obj, "Intprm2Replay")
+            col.prop(obj, "IntUnitIdNumReplay")	
+        if context.object.name.startswith("Intro"):
+            col.prop(obj, "FollowCameraTypeIntro")
+            col.prop(obj, "IntCameraNumIntro")
+            col.prop(obj, "IntCameraTimeIntro")	
+            col.prop(obj, "IntCamera_AtPathIntro")
+            col.prop(obj, "IntCamera_PathIntro")	
+            col.prop(obj, "IntFovyIntro")
+            col.prop(obj, "IntFovy2Intro")	
+            col.prop(obj, "IntFovySpeedIntro")
+            col.prop(obj, "IntUnitIdNumIntro")	
+			
 
-        
+ 
 		
 class VIEW3D_PT_Blank1_Blank2(Panel):
     bl_idname = "OBJECT_PT_my_panel"

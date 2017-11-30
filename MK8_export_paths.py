@@ -44,7 +44,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n      <PathPt type="array">\n')
  
         for objID, obj in enumerate(selectedObjects):
-            f.write('        <value BattleFlag="0" PathDir="0" Priority="1">\n')
+            f.write('        <value BattleFlag="' + str(obj.IntBattleFlag) + '" PathDir="' + str(obj.IntPathDir) + '" Priority="' + str(obj.PriorityEnum) + '">\n')
 
  
             f.write('          <NextPt type="array">\n')
@@ -119,7 +119,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('    </value>\n')
             f.write('  </EnemyPath>\n')
  
-    f.write('  <FirstCurve type="string">right</FirstCurve>\n')
+    f.write('  <FirstCurve type="string">right</FirstCurve>')
  
  
  
@@ -128,6 +128,167 @@ def write_some_data(context, filepath, use_some_setting):
  
  
  
+    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
+ 
+    # So now we will search for layers in the scene and group them!
+ 
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
+ 
+    layerIndecies = []
+ 
+    for layerIndex in range(20):  # loop from layer 0 to layer 19
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "intro" in ob.name.lower() and ob.select]
+ 
+        if selectedObjects:
+            layerIndecies.append(layerIndex)
+ 
+    for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+ 
+        # Write the start of intro path group
+		
+        if layerIndex == layerIndecies[0]:
+            f.write('\n  <IntroCamera type="array">\n')
+		
+ 
+        for objID, obj in enumerate(selectedObjects):
+            f.write('    <value CameraNum="' + str(obj.IntCameraNumIntro) + '" CameraTime="' + str(obj.IntCameraTimeIntro) + '" CameraType="' + str(obj.FollowCameraTypeIntro) + '" Camera_AtPath="' + str(obj.IntCamera_AtPathIntro) + '" Camera_Path="' + str(obj.IntCamera_PathIntro) + '" Fovy="' + str(obj.IntFovyIntro) + '" Fovy2="' + str(obj.IntFovy2Intro) + '" FovySpeed="' + str(obj.IntFovySpeedIntro) + '" UnitIdNum="' + str(obj.IntUnitIdNumIntro) + '">')
+			
+            zscale = round(obj.scale.z, 3)
+            yscale = round(obj.scale.y, 3)
+            xscale = round(obj.scale.x, 3)
+            XRot = round(obj.rotation_euler.x, 3)
+            ZRot = round(obj.rotation_euler.z, 3)
+            YRot = round(-obj.rotation_euler.y,
+                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            xloc = round(obj.location.x, 3)
+            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            zloc = round(obj.location.z, 3)
+ 
+            # Write Coordinates from item paths selected
+            f.write('\n      <Rotate X="')
+            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+            f.write('\n      <Scale X="')
+            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
+            f.write('\n      <Translate X="')
+            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+            f.write('\n    </value>\n')
+ 
+
+ 
+        f.write('  </IntroCamera>\n')	
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
+ 
+    # So now we will search for layers in the scene and group them!
+ 
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
+ 
+    layerIndecies = []
+ 
+    for layerIndex in range(20):  # loop from layer 0 to layer 19
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "item" in ob.name.lower() and ob.select]
+ 
+        if selectedObjects:
+            layerIndecies.append(layerIndex)
+ 
+    for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+ 
+        # Write the start of item path group
+		
+        if layerIndex == layerIndecies[0]:
+            f.write('\n  <ItemPath type="array">')
+		
+        if layerIndex != layerIndecies[0]:
+            f.write('    </value>')
+        f.write('\n    <value UnitIdNum="38">')
+        f.write('\n      <PathPt type="array">\n')
+ 
+        for objID, obj in enumerate(selectedObjects):
+            f.write('        <value Hover="' + str(obj.HoverEnum) + '" ItemPriority="' + str(obj.ItemPriorityEnum) + '" SearchArea="' + str(obj.SearchAreaEnum) + '">\n')
+
+ 
+            f.write('          <NextPt type="array">\n')
+ 
+ 
+            # Write next item path group ID
+            f.write('            <value PathId="')  # write the next group ID
+ 
+            if obj == selectedObjects[-1]:
+                if layerIndex == layerIndecies[-1]:
+                    f.write('0')
+                else:
+                    f.write('%d' % (groupIndex + 1))
+            else:
+                f.write('%d' % groupIndex)
+ 
+            # Write next item path ID
+            f.write('" PtId="')
+ 
+            if obj == selectedObjects[-1]:
+                f.write('0" />')
+            else:
+                f.write('%d" />' % (objID + 1))
+ 
+            f.write('\n          </NextPt>\n')
+ 
+            # Write previous item path group ID
+            f.write('          <PrevPt type="array">\n')
+            f.write('            <value PathId="')  # write the next group ID
+ 
+            if obj == selectedObjects[0]:
+                if layerIndex == layerIndecies[0]:
+                    f.write('%d' %  (len(layerIndecies) - 1))
+                else:
+                    f.write('%d' % (groupIndex - 1))
+            else:
+                f.write('%d' % groupIndex)
+ 
+            # Write previous item path ID
+            f.write('" PtId="')
+ 
+            if obj == selectedObjects[0]:
+                f.write('%d" />' %  (len(selectedObjects) - 1))
+            else:
+                f.write('%d" />' % (objID - 1))
+ 
+            f.write('\n          </PrevPt>')
+ 
+
+            XRot = round(obj.rotation_euler.x, 3)
+            ZRot = round(obj.rotation_euler.z, 3)
+            YRot = round(-obj.rotation_euler.y,
+                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            xloc = round(obj.location.x, 3)
+            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            zloc = round(obj.location.z, 3)
+ 
+            # Write Coordinates from item paths selected
+            f.write('\n          <Rotate X="')
+            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+            f.write('\n          <Translate X="')
+            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+            f.write('\n        </value>\n')
+ 
+        f.write('      </PathPt>\n')
+ 
+
+ 
+        if layerIndex != layerIndecies[0]:
+            f.write('')
+        else:
+            f.write('    </value>\n')
+            f.write('  </ItemPath>\n')
  
  
  
@@ -780,7 +941,62 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('    </value>\n')
             f.write('  </GlidePath>')
-	
+
+			
+			
+			
+
+    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
+ 
+    # So now we will search for layers in the scene and group them!
+ 
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
+ 
+    layerIndecies = []
+ 
+    for layerIndex in range(20):  # loop from layer 0 to layer 19
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "replay" in ob.name.lower() and ob.select]
+ 
+        if selectedObjects:
+            layerIndecies.append(layerIndex)
+ 
+    for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+ 
+        # Write the start of replay path group
+		
+        if layerIndex == layerIndecies[0]:
+            f.write('\n  <ReplayCamera type="array">\n')
+		
+ 
+        for objID, obj in enumerate(selectedObjects):
+            f.write('    <value AngleX="' + str(obj.IntAngleXReplay) + '" AngleY="' + str(obj.IntAngleYReplay) + '" AutoFovy="' + str(obj.AutoFovyEnumReplay) + '" CameraType="' + str(obj.CameraTypeEnumReplay) + '" Camera_Path="' + str(obj.IntCamera_PathReplay) + '" DepthOfField="' + str(obj.IntDepthOfFieldReplay) + '" Distance="' + str(obj.IntDistanceReplay) + '" Follow="' + str(obj.FollowEnumReplay) + '" Fovy="' + str(obj.IntFovyReplay) + '" Fovy2="' + str(obj.IntFovy2Replay) + '" FovySpeed="' + str(obj.IntFovySpeedReplay) + '" Group="' + str(obj.IntGroupReplay) + '" Pitch="' + str(obj.IntPitchReplay) + '" Roll="' + str(obj.IntRollReplay) + '" UnitIdNum="' + str(obj.IntUnitIdNumReplay) + '" Yaw="' + str(obj.IntYawReplay) + '" prm1="' + str(obj.Intprm1Replay) + '" prm2="' + str(obj.Intprm2Replay) + '">')
+
+            zscale = round(obj.scale.z, 3)
+            yscale = round(obj.scale.y, 3)
+            xscale = round(obj.scale.x, 3)
+            XRot = round(obj.rotation_euler.x, 3)
+            ZRot = round(obj.rotation_euler.z, 3)
+            YRot = round(-obj.rotation_euler.y,
+                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            xloc = round(obj.location.x, 3)
+            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            zloc = round(obj.location.z, 3)
+ 
+            # Write Coordinates from item paths selected
+            f.write('\n      <Rotate X="')
+            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+            f.write('\n      <Scale X="')
+            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
+            f.write('\n      <Translate X="')
+            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+            f.write('\n    </value>\n')
+ 
+
+ 
+        f.write('  </ReplayCamera>\n')	
+			
+			
 	
 	
     f.close()
