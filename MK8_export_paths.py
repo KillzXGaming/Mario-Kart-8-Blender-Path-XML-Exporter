@@ -15,7 +15,6 @@ def write_some_data(context, filepath, use_some_setting):
     print("running write_some_data...")
     f = open(filepath, 'w', encoding='utf-8')
  
-    f.write('  <EnemyPath type="array">')
  
     # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
  
@@ -26,7 +25,7 @@ def write_some_data(context, filepath, use_some_setting):
     layerIndecies = []
  
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "enemy" in ob.name.lower() and ob.select]
  
         if selectedObjects:
             layerIndecies.append(layerIndex)
@@ -34,7 +33,11 @@ def write_some_data(context, filepath, use_some_setting):
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
  
-        # Write the start of lap path group
+        # Write the start of enemy path group
+		
+        if layerIndex == layerIndecies[0]:
+            f.write('\n  <EnemyPath type="array">')
+		
         if layerIndex != layerIndecies[0]:
             f.write('    </value>')
         f.write('\n    <value UnitIdNum="38">')
@@ -47,7 +50,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('          <NextPt type="array">\n')
  
  
-            # Write next lap path group ID
+            # Write next enemy path group ID
             f.write('            <value PathId="')  # write the next group ID
  
             if obj == selectedObjects[-1]:
@@ -58,7 +61,7 @@ def write_some_data(context, filepath, use_some_setting):
             else:
                 f.write('%d' % groupIndex)
  
-            # Write next lap path ID
+            # Write next enemy path ID
             f.write('" PtId="')
  
             if obj == selectedObjects[-1]:
@@ -68,7 +71,7 @@ def write_some_data(context, filepath, use_some_setting):
  
             f.write('\n          </NextPt>\n')
  
-            # Write previous lap path group ID
+            # Write previous enemy path group ID
             f.write('          <PrevPt type="array">\n')
             f.write('            <value PathId="')  # write the next group ID
  
@@ -80,7 +83,7 @@ def write_some_data(context, filepath, use_some_setting):
             else:
                 f.write('%d' % groupIndex)
  
-            # Write previous lap path ID
+            # Write previous enemy path ID
             f.write('" PtId="')
  
             if obj == selectedObjects[0]:
@@ -99,7 +102,7 @@ def write_some_data(context, filepath, use_some_setting):
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
  
-            # Write Coordinates from lap paths selected
+            # Write Coordinates from enemy paths selected
             f.write('\n          <Rotate X="')
             f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
             f.write('\n          <Translate X="')
@@ -110,9 +113,11 @@ def write_some_data(context, filepath, use_some_setting):
  
 
  
- 
-    f.write('    </value>\n')
-    f.write('  </EnemyPath>\n')
+        if layerIndex != layerIndecies[0]:
+            f.write('')
+        else:
+            f.write('    </value>\n')
+            f.write('  </EnemyPath>\n')
  
     f.write('  <FirstCurve type="string">right</FirstCurve>\n')
  
@@ -146,7 +151,6 @@ def write_some_data(context, filepath, use_some_setting):
  
  
  
-    f.write('  <LapPath type="array">')
  
     # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
  
@@ -157,43 +161,47 @@ def write_some_data(context, filepath, use_some_setting):
     layerIndecies = []
  
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
  
         if selectedObjects:
             layerIndecies.append(layerIndex)
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
+ 
+ 
+        if layerIndex == layerIndecies[0]:
+            f.write('\n  <LapPath type="array">')
+
+
  
         # Write the start of lap path group
         if layerIndex != layerIndecies[0]:
             f.write('    </value>')
 			
-			
-        if "gravity" in obj.name.lower():
-            f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
-            f.write('\n      <LapPath_GravityPath type="array">')
-            f.write('\n        <value>0</value>')
-            f.write('\n        <value>2</value>')
-            f.write('\n      </LapPath_GravityPath>')
-            f.write('\n      <PathPt type="array">\n')
+		#Enable anti gravity anyways. These won't do anything without gravity paths
+        f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
+        f.write('\n      <LapPath_GravityPath type="array">')
+        f.write('\n        <value>0</value>')
+        f.write('\n        <value>2</value>')
+        f.write('\n      </LapPath_GravityPath>')
+        f.write('\n      <PathPt type="array">\n')
 
-        else:
-            f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="1">')
-            f.write('\n      <PathPt type="array">\n')
  
  
 		
         scene = context.scene
 		
         for objID, obj in enumerate(selectedObjects):
+		
+		
             if obj == selectedObjects[0]:
                 if layerIndex == layerIndecies[0]:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="-1" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">')
                 else:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="-1" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">')
             else:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="-1" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="65" MapCameraY="320" ReturnPosition="-1" SoundSW="-1">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">')
  
             f.write('\n          <NextPt type="array">\n')
  
@@ -314,9 +322,12 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('\n        </value>\n')
  
         f.write('      </ReturnPoints>\n')
- 
-    f.write('    </value>\n')
-    f.write('  </LapPath>')
+
+        if layerIndex != layerIndecies[0]:
+            f.write('')
+        else:
+            f.write('    </value>\n')
+            f.write('  </LapPath>')
 	
 	
 	
@@ -514,7 +525,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n      <PathPt type="array">\n')
  
         for objID, obj in enumerate(selectedObjectsGravity ):
-            f.write('        <value CameraHeight="1" GlideOnly="false" Transform="true">\n')
+            f.write('        <value CameraHeight="' + str(obj.IntCameraHeight) + '" GlideOnly="' + str(obj.GlideOnlyEnum) + '" Transform="' + str(obj.GTransformEnum) + '">\n')
 
             if obj == selectedObjectsGravity [-1]:
                     f.write('          <NextPt type="array" />\n')
@@ -667,7 +678,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n      <PathPt type="array">\n')
  
         for objID, obj in enumerate(selectedObjectsGlider ):
-            f.write('        <value Cannon="true">\n')
+            f.write('        <value Cannon="' + str(obj.CannonEnum) + '">\n')
 
             if obj == selectedObjectsGlider [-1]:
                     f.write('          <NextPt type="array" />\n')
