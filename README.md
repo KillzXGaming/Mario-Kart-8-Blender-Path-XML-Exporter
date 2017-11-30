@@ -36,8 +36,11 @@ This is a tool for exporting path data into a usable convertable XML format for 
 - Export object path via key frame data
 - Viewable intro camera (possbily export off of keyframes too
 - Override ID system with UI (For more than 2 groups to branch out to)
+
 ~~- UI for path properties~~
+
 ~~- UI for auto selecting and hiding paths~~
+
 ~~- UI for converting path types to easily make paths. (Example, duplicate lap paths and convert to enemy paths to instantly make them or use as a base)~~
 
 
