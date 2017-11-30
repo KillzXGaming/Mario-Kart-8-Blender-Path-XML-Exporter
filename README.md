@@ -17,7 +17,6 @@ This is a tool for exporting path data into a usable convertable XML format for 
 - Enemy Paths
 - Return Points (normals and tangents too)
 - Grouping paths (by blender layers)
-- GCamera
 - Item Paths
 - Replay Camera
 - Intro Camera
