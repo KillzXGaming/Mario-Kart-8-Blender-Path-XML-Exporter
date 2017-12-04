@@ -15,18 +15,27 @@ def write_some_data(context, filepath, use_some_setting):
     print("running write_some_data...")
     f = open(filepath, 'w', encoding='utf-8')
  
- 
+    Scene = bpy.context.scene  
+    
+	
+    if use_some_setting.NOLOOP == True:	
+        print("Property Enabled")
+    else:
+        print("Property Disabled")
+	
     # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
  
     # So now we will search for layers in the scene and group them!
- 
-    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
- 
     layerIndecies = []
+        
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
+    
  
+ 
+ #Enemy Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "enemy" in ob.name.lower() and ob.select]
- 
+        selected_objects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
         if selectedObjects:
             layerIndecies.append(layerIndex)
  
@@ -36,62 +45,136 @@ def write_some_data(context, filepath, use_some_setting):
         # Write the start of enemy path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <EnemyPath type="array">')
+            f.write('  <EnemyPath type="array">')
 		
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
         f.write('\n    <value UnitIdNum="38">')
         f.write('\n      <PathPt type="array">\n')
  
         for objID, obj in enumerate(selectedObjects):
             f.write('        <value BattleFlag="' + str(obj.IntBattleFlag) + '" PathDir="' + str(obj.IntPathDir) + '" Priority="' + str(obj.PriorityEnum) + '">\n')
+            if use_some_setting.NOLOOP == False:
 
- 
-            f.write('          <NextPt type="array">\n')
- 
- 
-            # Write next enemy path group ID
-            f.write('            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjects[-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('0')
+                f.write('          <NextPt type="array">\n')
+
+
+                # Write next enemy path group ID
+                f.write('            <value PathId="')  # write the next group ID
+
+                if obj == selectedObjects[-1]:
+                    if layerIndex == layerIndecies[-1]:
+                        f.write('0')
+                    else:
+                        f.write('%d' % (groupIndex + 1))
                 else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
- 
-            # Write next enemy path ID
-            f.write('" PtId="')
- 
-            if obj == selectedObjects[-1]:
-                f.write('0" />')
-            else:
-                f.write('%d" />' % (objID + 1))
- 
-            f.write('\n          </NextPt>\n')
- 
-            # Write previous enemy path group ID
-            f.write('          <PrevPt type="array">\n')
-            f.write('            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjects[0]:
-                if layerIndex == layerIndecies[0]:
-                    f.write('%d' %  (len(layerIndecies) - 1))
+                    f.write('%d' % groupIndex)
+
+                # Write next enemy path ID
+                f.write('" PtId="')
+
+                if obj == selectedObjects[-1]:
+                    f.write('0" />')
                 else:
-                    f.write('%d' % (groupIndex - 1))
+                    f.write('%d" />' % (objID + 1))
+
+                f.write('\n          </NextPt>\n')
+
+                # Write previous enemy path group ID
+                f.write('          <PrevPt type="array">\n')
+                f.write('            <value PathId="')  # write the next group ID
+
+                if obj == selectedObjects[0]:
+                    if layerIndex == layerIndecies[0]:
+                        f.write('%d' %  (len(layerIndecies) - 1))
+                    else:
+                        f.write('%d' % (groupIndex - 1))
+                else:
+                    f.write('%d' % groupIndex)
+
+                # Write previous enemy path ID
+                f.write('" PtId="')
+
+                if obj == selectedObjects[0]:
+                        f.write('%d" />' % (len(selected_objects )))
+                else:
+                    f.write('%d" />' % (objID - 1))
+
+                f.write('\n          </PrevPt>')
+				
+				
+				#NO LOOP
             else:
-                f.write('%d' % groupIndex)
- 
-            # Write previous enemy path ID
-            f.write('" PtId="')
- 
-            if obj == selectedObjects[0]:
-                f.write('%d" />' %  (len(selectedObjects) - 1))
-            else:
-                f.write('%d" />' % (objID - 1))
- 
-            f.write('\n          </PrevPt>')
+                if obj == selectedObjects [-1]:
+                     f.write('          <NextPt type="array" />\n')
+                else:
+                    f.write('          <NextPt type="array">\n')
+					
+                if obj == selectedObjects [-1]:
+                        f.write('')  # Last Object does not loop so has no ID after
+                else:
+                        f.write('            <value PathId="')  # write the next group ID
+                                    
+                if obj == selectedObjects [-1]:
+                    if layerIndex == layerIndecies[-1]:
+                        f.write('')
+                    else:
+                        f.write('%d' % (groupIndex + 1))
+                else:
+                    f.write('%d' % groupIndex)
+     
+                if obj == selectedObjects [-1]:
+                        f.write('')
+                                            
+                # Write next lap path ID
+                if obj == selectedObjects [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+                else:
+                    f.write('" PtId="')
+     
+                if obj == selectedObjects [-1]:
+                    f.write('')
+                else:
+                    f.write('%d" />' % (objID + 1))
+     
+                if obj == selectedObjects [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+                else:
+                    f.write('\n          </NextPt>\n')
+     
+                # Write previous lap path group ID
+                if obj == selectedObjects [0]:
+                        f.write('          <PrevPt type="array" />')
+                else:
+                        f.write('          <PrevPt type="array">')
+                            
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                    f.write('\n            <value PathId="')  # write the next group ID
+     
+                if obj == selectedObjects [0]:
+                        f.write('')
+                else:
+                    f.write('%d' % groupIndex)
+     
+                # Write previous lap path ID
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                    f.write('" PtId="')
+     
+                if obj == selectedObjects [0]:
+                    f.write('')
+                else:
+                    f.write('%d" />' % (objID - 1))
+                                    
+                                    
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                     f.write('\n          </PrevPt>')
+                
  
 
             XRot = round(obj.rotation_euler.x, 3)
@@ -113,13 +196,13 @@ def write_some_data(context, filepath, use_some_setting):
  
 
  
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
             f.write('    </value>\n')
             f.write('  </EnemyPath>\n')
  
-    f.write('  <FirstCurve type="string">right</FirstCurve>')
+    f.write('  <FirstCurve type="string">right</FirstCurve>\n')
  
  
  
@@ -135,7 +218,7 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #Intro Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "intro" in ob.name.lower() and ob.select]
  
@@ -194,9 +277,9 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #Item Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "item" in ob.name.lower() and ob.select]
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
  
         if selectedObjects:
             layerIndecies.append(layerIndex)
@@ -207,9 +290,9 @@ def write_some_data(context, filepath, use_some_setting):
         # Write the start of item path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <ItemPath type="array">')
+            f.write('  <ItemPath type="array">')
 		
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
         f.write('\n    <value UnitIdNum="38">')
         f.write('\n      <PathPt type="array">\n')
@@ -218,51 +301,125 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('        <value Hover="' + str(obj.HoverEnum) + '" ItemPriority="' + str(obj.ItemPriorityEnum) + '" SearchArea="' + str(obj.SearchAreaEnum) + '">\n')
 
  
-            f.write('          <NextPt type="array">\n')
- 
- 
-            # Write next item path group ID
-            f.write('            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjects[-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('0')
+            if use_some_setting.NOLOOP == False:
+                f.write('          <NextPt type="array">\n')
+
+
+                # Write next enemy path group ID
+                f.write('            <value PathId="')  # write the next group ID
+
+                if obj == selectedObjects[-1]:
+                    if layerIndex == layerIndecies[-1]:
+                        f.write('0')
+                    else:
+                        f.write('%d' % (groupIndex + 1))
                 else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
- 
-            # Write next item path ID
-            f.write('" PtId="')
- 
-            if obj == selectedObjects[-1]:
-                f.write('0" />')
-            else:
-                f.write('%d" />' % (objID + 1))
- 
-            f.write('\n          </NextPt>\n')
- 
-            # Write previous item path group ID
-            f.write('          <PrevPt type="array">\n')
-            f.write('            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjects[0]:
-                if layerIndex == layerIndecies[0]:
-                    f.write('%d' %  (len(layerIndecies) - 1))
+                    f.write('%d' % groupIndex)
+
+                # Write next enemy path ID
+                f.write('" PtId="')
+
+                if obj == selectedObjects[-1]:
+                    f.write('0" />')
                 else:
-                    f.write('%d' % (groupIndex - 1))
+                    f.write('%d" />' % (objID + 1))
+
+                f.write('\n          </NextPt>\n')
+
+                # Write previous enemy path group ID
+                f.write('          <PrevPt type="array">\n')
+                f.write('            <value PathId="')  # write the next group ID
+
+                if obj == selectedObjects[0]:
+                    if layerIndex == layerIndecies[0]:
+                        f.write('%d' %  (len(layerIndecies) - 1))
+                    else:
+                        f.write('%d' % (groupIndex - 1))
+                else:
+                    f.write('%d' % groupIndex)
+
+                # Write previous enemy path ID
+                f.write('" PtId="')
+
+                if obj == selectedObjects[0]:
+                        f.write('%d" />' % (len(selected_objects )))
+                else:
+                    f.write('%d" />' % (objID - 1))
+
+                f.write('\n          </PrevPt>')
+				
+
+				#NO LOOP
             else:
-                f.write('%d' % groupIndex)
- 
-            # Write previous item path ID
-            f.write('" PtId="')
- 
-            if obj == selectedObjects[0]:
-                f.write('%d" />' %  (len(selectedObjects) - 1))
-            else:
-                f.write('%d" />' % (objID - 1))
- 
-            f.write('\n          </PrevPt>')
+                if obj == selectedObjects [-1]:
+                     f.write('          <NextPt type="array" />\n')
+                else:
+                    f.write('          <NextPt type="array">\n')
+
+                if obj == selectedObjects [-1]:
+                        f.write('')  # Last Object does not loop so has no ID after
+                else:
+                        f.write('            <value PathId="')  # write the next group ID
+                                    
+                if obj == selectedObjects [-1]:
+                    if layerIndex == layerIndecies[-1]:
+                        f.write('')
+                    else:
+                        f.write('%d' % (groupIndex + 1))
+                else:
+                    f.write('%d' % groupIndex)
+     
+                if obj == selectedObjects [-1]:
+                        f.write('')
+                                            
+                # Write next lap path ID
+                if obj == selectedObjects [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+                else:
+                    f.write('" PtId="')
+     
+                if obj == selectedObjects [-1]:
+                    f.write('')
+                else:
+                    f.write('%d" />' % (objID + 1))
+     
+                if obj == selectedObjects [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+                else:
+                    f.write('\n          </NextPt>\n')
+     
+                # Write previous lap path group ID
+                if obj == selectedObjects [0]:
+                        f.write('          <PrevPt type="array" />')
+                else:
+                        f.write('          <PrevPt type="array">')
+                            
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                    f.write('\n            <value PathId="')  # write the next group ID
+     
+                if obj == selectedObjects [0]:
+                        f.write('')
+                else:
+                    f.write('%d' % groupIndex)
+     
+                # Write previous lap path ID
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                    f.write('" PtId="')
+     
+                if obj == selectedObjects [0]:
+                    f.write('')
+                else:
+                    f.write('%d" />' % (objID - 1))
+                                    
+                                    
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                     f.write('\n          </PrevPt>')
  
 
             XRot = round(obj.rotation_euler.x, 3)
@@ -284,32 +441,16 @@ def write_some_data(context, filepath, use_some_setting):
  
 
  
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
             f.write('    </value>\n')
             f.write('  </ItemPath>\n')
  
  
+
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
  
  
  
@@ -320,7 +461,7 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #Lap Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
  
@@ -330,21 +471,20 @@ def write_some_data(context, filepath, use_some_setting):
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
  
+
  
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <LapPath type="array">')
-
+            f.write('  <LapPath type="array">')
 
  
         # Write the start of lap path group
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
 			
 		#Enable anti gravity anyways. These won't do anything without gravity paths
         f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
         f.write('\n      <LapPath_GravityPath type="array">')
-        f.write('\n        <value>0</value>')
-        f.write('\n        <value>2</value>')
+        f.write('\n        <value>0</value>') #Todo figure out what this value does???? May be group related
         f.write('\n      </LapPath_GravityPath>')
         f.write('\n      <PathPt type="array">\n')
 
@@ -358,57 +498,133 @@ def write_some_data(context, filepath, use_some_setting):
 		
             if obj == selectedObjects[0]:
                 if layerIndex == layerIndecies[0]:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
                 else:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
             else:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">')
- 
-            f.write('\n          <NextPt type="array">\n')
- 
- 
-            # Write next lap path group ID
-            f.write('            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjects[-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('0')
+                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
+
+            if use_some_setting.NOLOOP == False:
+
+                f.write('          <NextPt type="array">\n')
+
+
+                # Write next enemy path group ID
+                f.write('            <value PathId="')  # write the next group ID
+
+                if obj == selectedObjects[-1]:
+                    if layerIndex == layerIndecies[-1]:
+                        f.write('0')
+                    else:
+                        f.write('%d' % (groupIndex + 1))
                 else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
- 
-            # Write next lap path ID
-            f.write('" PtId="')
- 
-            if obj == selectedObjects[-1]:
-                f.write('0" />')
-            else:
-                f.write('%d" />' % (objID + 1))
- 
-            f.write('\n          </NextPt>\n')
- 
-            # Write previous lap path group ID
-            f.write('          <PrevPt type="array">\n')
-            f.write('            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjects[0]:
-                if layerIndex == layerIndecies[0]:
-                    f.write('%d' %  (len(layerIndecies) - 1))
+                    f.write('%d' % groupIndex)
+
+                # Write next enemy path ID
+                f.write('" PtId="')
+
+                if obj == selectedObjects[-1]:
+                    f.write('0" />')
                 else:
-                    f.write('%d' % (groupIndex - 1))
+                    f.write('%d" />' % (objID + 1))
+
+                f.write('\n          </NextPt>\n')
+
+                # Write previous enemy path group ID
+                f.write('          <PrevPt type="array">\n')
+                f.write('            <value PathId="')  # write the next group ID
+
+                if obj == selectedObjects[0]:
+                    if layerIndex == layerIndecies[0]:
+                        f.write('%d' %  (len(layerIndecies) - 1))
+                    else:
+                        f.write('%d' % (groupIndex - 1))
+                else:
+                    f.write('%d' % groupIndex)
+
+                # Write previous enemy path ID
+                f.write('" PtId="')
+
+                if obj == selectedObjects[0]:
+                        f.write('%d" />' % (len(selected_objects )))
+                else:
+                    f.write('%d" />' % (objID - 1))
+
+                f.write('\n          </PrevPt>')
+				
+				
+				#NO LOOP
             else:
-                f.write('%d' % groupIndex)
- 
-            # Write previous lap path ID
-            f.write('" PtId="')
- 
-            if obj == selectedObjects[0]:
-                f.write('%d" />' %  (len(selectedObjects) - 1))
-            else:
-                f.write('%d" />' % (objID - 1))
- 
-            f.write('\n          </PrevPt>')
+                if obj == selectedObjects [-1]:
+                     f.write('          <NextPt type="array" />\n')
+                else:
+                    f.write('          <NextPt type="array">\n')
+
+                if obj == selectedObjects [-1]:
+                        f.write('')  # Last Object does not loop so has no ID after
+                else:
+                        f.write('            <value PathId="')  # write the next group ID
+                                    
+                if obj == selectedObjects [-1]:
+                    if layerIndex == layerIndecies[-1]:
+                        f.write('')
+                    else:
+                        f.write('%d' % (groupIndex + 1))
+                else:
+                    f.write('%d' % groupIndex)
+     
+                if obj == selectedObjects [-1]:
+                        f.write('')
+                                            
+                # Write next lap path ID
+                if obj == selectedObjects [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+                else:
+                    f.write('" PtId="')
+     
+                if obj == selectedObjects [-1]:
+                    f.write('')
+                else:
+                    f.write('%d" />' % (objID + 1))
+     
+                if obj == selectedObjects [-1]:
+                    f.write('')  # Last Object does not loop so has no ID after
+                else:
+                    f.write('\n          </NextPt>\n')
+     
+                # Write previous lap path group ID
+                if obj == selectedObjects [0]:
+                        f.write('          <PrevPt type="array" />')
+                else:
+                        f.write('          <PrevPt type="array">')
+                            
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                    f.write('\n            <value PathId="')  # write the next group ID
+     
+                if obj == selectedObjects [0]:
+                        f.write('')
+                else:
+                    f.write('%d' % groupIndex)
+     
+                # Write previous lap path ID
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                    f.write('" PtId="')
+     
+                if obj == selectedObjects [0]:
+                    f.write('')
+                else:
+                    f.write('%d" />' % (objID - 1))
+                                    
+                                    
+                if obj == selectedObjects [0]:
+                    f.write('')  # Last Object does not loop so has no ID before
+                else:
+                     f.write('\n          </PrevPt>')
+            
             #Scale paths as they are smaller for some reason
             if obj.type != 'EMPTY': 
                  ScaleX = obj.scale.x 
@@ -484,7 +700,7 @@ def write_some_data(context, filepath, use_some_setting):
  
         f.write('      </ReturnPoints>\n')
 
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
             f.write('    </value>\n')
@@ -510,7 +726,7 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #GCamera Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
         selectedObjectsGCamera  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
  
@@ -529,7 +745,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('\n  <GCameraPath type="array">')
 
 
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
                     
 			
@@ -635,7 +851,7 @@ def write_some_data(context, filepath, use_some_setting):
  
         f.write('      </PathPt>\n')
  
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
             f.write('    </value>\n')
@@ -643,11 +859,6 @@ def write_some_data(context, filepath, use_some_setting):
 	
 	
 	
-	
-	
-	
-	
-
     
  
     # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
@@ -657,7 +868,7 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #Gravity paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
         selectedObjectsGravity  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
  
@@ -676,7 +887,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('\n  <GravityPath type="array">')
 
 
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
                     
 			
@@ -782,29 +993,11 @@ def write_some_data(context, filepath, use_some_setting):
  
         f.write('      </PathPt>\n')
  
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
             f.write('    </value>\n')
             f.write('  </GravityPath>')
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-    
-	
-	
-	
-	
-	
 	
 	
 	
@@ -817,7 +1010,7 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #Glider Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
         selectedObjectsGlider  = [ob for ob in objects if ob.layers[layerIndex] and  "glide" in ob.name.lower() and ob.select]
  
@@ -831,7 +1024,7 @@ def write_some_data(context, filepath, use_some_setting):
         if layerIndex == layerIndecies[0]:
             f.write('\n  <GlidePath type="array">')
 		
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
 			
 			
@@ -936,13 +1129,164 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('      </PathPt>\n')
  
  
-        if layerIndex != layerIndecies[0]:
+        if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
             f.write('    </value>\n')
             f.write('  </GlidePath>')
 
+	
+
+	
+	
+	
+	
+	
+	
+	
+
+ #These need to be per key frame! Each object seoerates the value entries!
+#ObjPaths
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
+ 
+    # So now we will search for layers in the scene and group them!
+ 
+    for obj in context.selected_objects:
+        print("-" * 30)
+        print(obj.name)
+        ad = obj.animation_data
+        if ad is None:
+            print("has no animation data")
+            continue
+        action = ad.action
+        if action is None:
+            print("has no action")
+            continue
+
+        # fcurves have a datapath and an index.
+        datapaths = ["location"]
+        for dp in datapaths:
+            for i, axis in enumerate("xyz"):
+                # find the fcurve with datapath and index req'd
+                fcurve = action.fcurves.find(dp, i)
+                if fcurve:
+                    print("%s.%c" % (dp, axis))
+                    Xkeys = [(kfp.co.x, fcurve.evaluate(kfp.co.x)) for kfp in fcurve.keyframe_points]
+                    # keys as a list of (frame, value) pairs.
+                else:
+                    print("No %s.%c fcurve" % (dp, axis))
+ 
+ 
+    def get_keyframes(obj_list):
+        keyframes = []
+        for obj in obj_list:
+            anim = obj.animation_data
+            if anim is not None and anim.action is not None:
+                for fcu in anim.action.fcurves:
+                    for keyframe in fcu.keyframe_points:
+                        x, y = keyframe.co
+                        if x not in keyframes:
+                            keyframes.append((math.ceil(x)))
+        return keyframes
+ 
+ 
+    selection = bpy.context.selected_objects
+    keys = get_keyframes(selection)
+ 
+ #ObjPaths 
+ 
+ #These need to be per key frame! Each object seoerates the value entries!
+    f.write('\n  <ObjPath type="array">\n')
+
+    for obj in selection:
+	
+            #These are for normals
 			
+
+	
+        f.write('    <value Delete="false" IsClosed="true" RailType="1" UnitIdNum="21">')
+        f.write('\n      <ObjPt type="path">')
+		
+        selectedObjectsPath  =  [key for key in keys]
+		
+        for key in selectedObjectsPath:
+            bpy.context.scene.frame_set(key)
+            mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
+
+            mat = mat_rot.to_4x4() #Lets turn this into a grid!
+		
+            # nxloc = round(obj.location.nx, 3) This doesn't work :(
+            # nyloc = round(obj.location.ny, 3)
+            # nzloc = round(obj.location.nz, 3)
+		
+            XRot = round(obj.rotation_euler.x, 3)
+            ZRot = round(obj.rotation_euler.z, 3)
+            YRot = round(obj.rotation_euler.y, 3)
+            xloc = round(obj.location.x, 3)
+            yloc = round(obj.location.y, 3)
+            zloc = round(obj.location.z, 3)
+		
+            f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(yloc) + 'f" z="' + str(zloc) + 'f" nx="1f" ny="0f" nz="0f" val="0" />')
+		
+		
+		
+        f.write('\n        </ObjPt>')
+        f.write('\n      <PathPt type="array">\n')
+        for keyID, key in enumerate(selectedObjectsPath ):
+            f.write('        <value Index="')
+            f.write('%d" />' % (keyID)) #Writes index for the flag
+            f.write('" prm1="0f" prm2="0f">')
+
+ 
+
+
+	
+		
+ 
+            # Write Coordinates from item paths selected
+            f.write('\n          <Rotate X="')
+            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+            f.write('\n          <Translate X="')
+            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+            f.write('\n        </value>\n')
+ 
+ 
+        f.write('      </PathPt>')
+        f.write('\n    </value>\n')
+    f.write('  </ObjPath>')
+	
+	
+	
+	
+	
+
+
+			
+			
+	
+	
+    f.close()
+ 
+    return {'FINISHED'}
+
+
+
+
+
+
+
+
+	
 			
 			
 
@@ -953,7 +1297,7 @@ def write_some_data(context, filepath, use_some_setting):
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
- 
+ #Replay Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "replay" in ob.name.lower() and ob.select]
  
@@ -997,7 +1341,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('  </ReplayCamera>\n')	
 			
 			
-	
+
 	
     f.close()
  
@@ -1027,22 +1371,15 @@ class ExportSomeData(Operator, ExportHelper):
  
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
-    use_setting = BoolProperty(
-        name="Example Boolean",
-        description="Example Tooltip",
-        default=True,
-    )
+
  
-    type = EnumProperty(
-        name="Mario Kart 8 XML Path Exporter",
-        description="Choose between two items",
-        items=(('OPT_A', "First Option", "Description one"),
-               ('OPT_B', "Second Option", "Description two")),
-        default='OPT_A',
-    )
+    NOLOOP =  bpy.props.BoolProperty(name="Do Not Loop Paths", description="Test2", default=False)
+ 
+ 
+
  
     def execute(self, context):
-        return write_some_data(context, self.filepath, self.use_setting)
+        return write_some_data(context, self.filepath, self.properties)
  
  
 # Only needed if you want to add into a dynamic menu

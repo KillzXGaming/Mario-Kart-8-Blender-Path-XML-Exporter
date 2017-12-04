@@ -261,8 +261,8 @@ def initprop():
     bpy.types.Object.HeadlightsEnum = EnumProperty(
         name="",
         description="Apply Data to attribute.",
-        items=[ ('False', "Headlights Off", ""),
-                ('True', "Headlights On", ""),
+        items=[ ('false', "Headlights Off", ""),
+                ('true', "Headlights On", ""),
                ]
         )
 	#props of gravity path flags
@@ -311,14 +311,14 @@ def initprop():
     bpy.types.Object.IntPathDir = bpy.props.IntProperty(
 	name="Path Directory",
 	description="IDK what this does",
-	min=1, max=5,
-	default=1)
+	min=0, max=5,
+	default=0)
 	
     bpy.types.Object.IntBattleFlag = bpy.props.IntProperty(
 	name="Battle Flag",
 	description="IDK what this does",
-	min=1, max=5,
-	default=1)
+	min=0, max=5,
+	default=0)
 	
 	#props of item path flags
 	
