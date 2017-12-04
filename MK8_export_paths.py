@@ -34,22 +34,22 @@ def write_some_data(context, filepath, use_some_setting):
  
  #Enemy Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selected_objects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
         if selectedObjects:
             layerIndecies.append(layerIndex)
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
- 
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
+        sOIPL = [ob for ob in objects if ob.layers[layerIndecies[groupIndex - 1]] and  "lap" in ob.name.lower() and ob.select]
+		
         # Write the start of enemy path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('  <EnemyPath type="array">')
+            f.write('  <EnemyPath type="array">\n')
 		
-        if layerIndex != layerIndecies[-1]:
-            f.write('    </value>')
-        f.write('\n    <value UnitIdNum="38">')
+        if layerIndex != layerIndecies[0]:
+            f.write('    </value>\n')
+        f.write('    <value UnitIdNum="38">')
         f.write('\n      <PathPt type="array">\n')
  
         for objID, obj in enumerate(selectedObjects):
@@ -96,7 +96,7 @@ def write_some_data(context, filepath, use_some_setting):
                 f.write('" PtId="')
 
                 if obj == selectedObjects[0]:
-                        f.write('%d" />' % (len(selected_objects )))
+                        f.write('%d" />' % (len(sOIPL) - 1))
                 else:
                     f.write('%d" />' % (objID - 1))
 
@@ -179,8 +179,7 @@ def write_some_data(context, filepath, use_some_setting):
 
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -227,7 +226,8 @@ def write_some_data(context, filepath, use_some_setting):
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
- 
+        sOIPL = [ob for ob in objects if ob.layers[layerIndecies[groupIndex - 1]] and  "lap" in ob.name.lower() and ob.select]
+
         # Write the start of intro path group
 		
         if layerIndex == layerIndecies[0]:
@@ -242,8 +242,7 @@ def write_some_data(context, filepath, use_some_setting):
             xscale = round(obj.scale.x, 3)
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -285,16 +284,17 @@ def write_some_data(context, filepath, use_some_setting):
             layerIndecies.append(layerIndex)
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
- 
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
+        sOIPL = [ob for ob in objects if ob.layers[layerIndecies[groupIndex - 1]] and  "lap" in ob.name.lower() and ob.select]
+
         # Write the start of item path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('  <ItemPath type="array">')
+            f.write('  <ItemPath type="array">\n')
 		
-        if layerIndex != layerIndecies[-1]:
-            f.write('    </value>')
-        f.write('\n    <value UnitIdNum="38">')
+        if layerIndex != layerIndecies[0]:
+            f.write('    </value>\n')
+        f.write('    <value UnitIdNum="38">')
         f.write('\n      <PathPt type="array">\n')
  
         for objID, obj in enumerate(selectedObjects):
@@ -342,7 +342,7 @@ def write_some_data(context, filepath, use_some_setting):
                 f.write('" PtId="')
 
                 if obj == selectedObjects[0]:
-                        f.write('%d" />' % (len(selected_objects )))
+                        f.write('%d" />' % (len(sOIPL) - 1))
                 else:
                     f.write('%d" />' % (objID - 1))
 
@@ -424,8 +424,7 @@ def write_some_data(context, filepath, use_some_setting):
 
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -470,7 +469,7 @@ def write_some_data(context, filepath, use_some_setting):
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
- 
+        sOIPL = [ob for ob in objects if ob.layers[layerIndecies[groupIndex - 1]] and  "lap" in ob.name.lower() and ob.select]
 
  
         if layerIndex == layerIndecies[0]:
@@ -478,14 +477,15 @@ def write_some_data(context, filepath, use_some_setting):
 
  
         # Write the start of lap path group
-        if layerIndex != layerIndecies[-1]:
+        if layerIndex != layerIndecies[0]:
             f.write('    </value>')
 			
 		#Enable anti gravity anyways. These won't do anything without gravity paths
-        f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
-        f.write('\n      <LapPath_GravityPath type="array">')
-        f.write('\n        <value>0</value>') #Todo figure out what this value does???? May be group related
-        f.write('\n      </LapPath_GravityPath>')
+        if obj.select:
+                f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
+                f.write('\n      <LapPath_GravityPath type="array">')
+                f.write('\n        <value>0</value>') #Todo figure out what this value does???? May be group related
+                f.write('\n      </LapPath_GravityPath>')
         f.write('\n      <PathPt type="array">\n')
 
  
@@ -495,15 +495,19 @@ def write_some_data(context, filepath, use_some_setting):
 		
         for objID, obj in enumerate(selectedObjects):
 		
-		
-            if obj == selectedObjects[0]:
-                if layerIndex == layerIndecies[0]:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
+            if use_some_setting.NOLOOP == False:
+                if obj == selectedObjects[0]:
+                    if layerIndex == layerIndecies[0]:
+                      f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="0" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
+                    else:		
+                      f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
                 else:
                   f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
             else:
                   f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
 
+				  
+				  
             if use_some_setting.NOLOOP == False:
 
                 f.write('          <NextPt type="array">\n')
@@ -546,7 +550,7 @@ def write_some_data(context, filepath, use_some_setting):
                 f.write('" PtId="')
 
                 if obj == selectedObjects[0]:
-                        f.write('%d" />' % (len(selected_objects )))
+                        f.write('%d" />' % (len(sOIPL) - 1))
                 else:
                     f.write('%d" />' % (objID - 1))
 
@@ -627,9 +631,9 @@ def write_some_data(context, filepath, use_some_setting):
             
             #Scale paths as they are smaller for some reason
             if obj.type != 'EMPTY': 
-                 ScaleX = obj.scale.x 
-                 ScaleY = obj.scale.y 
-                 ScaleZ = obj.scale.z 
+                 ScaleX = obj.scale.x * 2
+                 ScaleY = obj.scale.y * 2
+                 ScaleZ = obj.scale.z * 2
             else:
                 ScaleX = obj.scale.x
                 ScaleY = obj.scale.y
@@ -641,8 +645,7 @@ def write_some_data(context, filepath, use_some_setting):
             xscale = round(ScaleX, 3)
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                             3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -829,13 +832,21 @@ def write_some_data(context, filepath, use_some_setting):
             else:
                  f.write('\n          </PrevPt>')
  
-            zscale = round(obj.scale.z, 3)
-            yscale = round(obj.scale.y, 3)
-            xscale = round(obj.scale.x, 3)
+            if obj.type != 'EMPTY': 
+                 ScaleX = obj.scale.x * 2
+                 ScaleY = obj.scale.y * 2
+                 ScaleZ = obj.scale.z * 2
+            else:
+                ScaleX = obj.scale.x
+                ScaleY = obj.scale.y
+                ScaleZ = obj.scale.z
+ 
+            zscale = round(ScaleZ, 3)
+            yscale = round(ScaleX, 3)
+            xscale = round(ScaleX, 3)
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -971,13 +982,21 @@ def write_some_data(context, filepath, use_some_setting):
             else:
                  f.write('\n          </PrevPt>')
  
-            zscale = round(obj.scale.z, 3)
-            yscale = round(obj.scale.y, 3)
-            xscale = round(obj.scale.x, 3)
+            if obj.type != 'EMPTY': 
+                 ScaleX = obj.scale.x * 2
+                 ScaleY = obj.scale.y * 2
+                 ScaleZ = obj.scale.z * 2
+            else:
+                ScaleX = obj.scale.x
+                ScaleY = obj.scale.y
+                ScaleZ = obj.scale.z
+ 
+            zscale = round(ScaleZ, 3)
+            yscale = round(ScaleX, 3)
+            xscale = round(ScaleX, 3)
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -1106,13 +1125,22 @@ def write_some_data(context, filepath, use_some_setting):
             else:
                  f.write('\n          </PrevPt>')
  
-            zscale = round(obj.scale.z, 3)
-            yscale = round(obj.scale.y, 3)
-            xscale = round(obj.scale.x, 3)
+ 
+            if obj.type != 'EMPTY': 
+                 ScaleX = obj.scale.x * 2
+                 ScaleY = obj.scale.y * 2
+                 ScaleZ = obj.scale.z * 2
+            else:
+                ScaleX = obj.scale.x
+                ScaleY = obj.scale.y
+                ScaleZ = obj.scale.z
+ 
+            zscale = round(ScaleZ, 3)
+            yscale = round(ScaleX, 3)
+            xscale = round(ScaleX, 3)
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
@@ -1231,9 +1259,9 @@ def write_some_data(context, filepath, use_some_setting):
 		
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(obj.rotation_euler.y, 3)
+            YRot = round(-obj.rotation_euler.y,3)
             xloc = round(obj.location.x, 3)
-            yloc = round(obj.location.y, 3)
+            yloc = round(-obj.location.y, 3)
             zloc = round(obj.location.z, 3)
 		
             f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(yloc) + 'f" z="' + str(zloc) + 'f" nx="1f" ny="0f" nz="0f" val="0" />')
@@ -1321,8 +1349,7 @@ def write_some_data(context, filepath, use_some_setting):
             xscale = round(obj.scale.x, 3)
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
