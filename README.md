@@ -22,10 +22,12 @@ This is a tool for exporting path data into a usable convertable XML format for 
 - Intro Camera
 
 
+**Nearly done**
+-Object Path (Done by key frames)
+-Normal path types (used via intro camera and other things)
 
 **Not supported YET**
 
-- Object Path (will be done by key frames)
 - Pull paths
 
 
@@ -42,8 +44,8 @@ This is a tool for exporting path data into a usable convertable XML format for 
 
 ~~- UI for converting path types to easily make paths. (Example, duplicate lap paths and convert to enemy paths to instantly make them or use as a base)~~
 
-
-
+**In the future? May do if requested enough**
+A way to import mkwii CT paths. These could then be scaled along with the course in blender. 
 
 ## How to use:
 
