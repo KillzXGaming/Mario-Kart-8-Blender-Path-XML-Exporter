@@ -33,8 +33,10 @@ This is a tool for exporting path data into a usable convertable XML format for 
 
 **Todo**
 
+- Link object paths with Rays api somehow? IDs need to be from those mk8 objects. 
+- Clean up code alot. It's really messy and i can shorten it more. 
 - Create a good enough object to repesent enemy paths
-- Export object path via key frame data
+- ~~Export object path via key frame data~~
 - Viewable intro camera (possbily export off of keyframes too
 - Override ID system with UI (For more than 2 groups to branch out to)
 
