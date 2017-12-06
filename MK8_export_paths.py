@@ -179,17 +179,19 @@ def write_some_data(context, filepath, use_some_setting):
 
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+            YRot = round(-obj.rotation_euler.y,
+                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
             zloc = round(obj.location.z, 3)
  
-            # Write Coordinates from enemy paths selected
+            # Write Coordinates from lap paths selected
             f.write('\n          <Rotate X="')
             f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
             f.write('\n          <Translate X="')
             f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
             f.write('\n        </value>\n')
+
  
         f.write('      </PathPt>\n')
  
@@ -1226,7 +1228,7 @@ def write_some_data(context, filepath, use_some_setting):
                         if x not in keyframes:
                             keyframes.append((math.ceil(x)))
         return keyframes
- 
+
  
     selection = bpy.context.selected_objects
     keys = get_keyframes(selection)
@@ -1237,46 +1239,61 @@ def write_some_data(context, filepath, use_some_setting):
     f.write('\n  <ObjPath type="array">\n')
 
     for obj in selection:
-	
+        selectedObjectsPath  =  [key for key in keys]
             #These are for normals
 			
-
+        LASTFRAME = keys[-1]
 	
-        f.write('    <value Delete="false" IsClosed="true" RailType="1" UnitIdNum="21">')
+        f.write('    <value IsClosed="false" PtNum="' + str(LASTFRAME) + '" SplitWidth="0.5f" UnitIdNum="6">')
         f.write('\n      <ObjPt type="path">')
 		
-        selectedObjectsPath  =  [key for key in keys]
+        
 		
-        for key in selectedObjectsPath:
-            bpy.context.scene.frame_set(key)
-            mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
+		#These need to be written for every frame between keyframes
 
-            mat = mat_rot.to_4x4() #Lets turn this into a grid!
+        sce = bpy.context.scene
+        ob = bpy.context.object
+        my_frames = get_keyframes(selection)
 		
-            # nxloc = round(obj.location.nx, 3) This doesn't work :(
-            # nyloc = round(obj.location.ny, 3)
-            # nzloc = round(obj.location.nz, 3)
+        def print_details(obj_list):
+            XRot = round(obj_list.rotation_euler.x, 2)
+            ZRot = round(obj_list.rotation_euler.z, 2)
+            YRot = round(-obj_list.rotation_euler.y, 2)
+            xloc = round(obj_list.location.x, 2)
+            yloc = round(-obj_list.location.y, 2)
+            zloc = round(obj_list.location.z, 2)		
+            f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(zloc) + 'f" z="' + str(yloc) + 'f" nx="1f" ny="0f" nz="0f" val="0" />')
 		
+		
+		
+
+        for key in range(my_frames[0], my_frames[len(my_frames)-1]+1):
+            bpy.context.scene.frame_set(key)
+            for obj in selection:
+                print_details(obj)
+
+		
+		
+		
+        f.write('\n        </ObjPt>')
+        f.write('\n      <PathPt type="array">\n')
+		
+		#These write for every keyframe instead!
+		
+        for key in get_keyframes(selection):
+            bpy.context.scene.frame_set(key)
+            f.write('        <value Index="')
+            f.write(str(key)) #Writes index for the flag
+            f.write('" prm1="0f" prm2="0f">')
+			
+
+			
             XRot = round(obj.rotation_euler.x, 3)
             ZRot = round(obj.rotation_euler.z, 3)
             YRot = round(-obj.rotation_euler.y,3)
             xloc = round(obj.location.x, 3)
             yloc = round(-obj.location.y, 3)
             zloc = round(obj.location.z, 3)
-		
-            f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(yloc) + 'f" z="' + str(zloc) + 'f" nx="1f" ny="0f" nz="0f" val="0" />')
-		
-		
-		
-        f.write('\n        </ObjPt>')
-        f.write('\n      <PathPt type="array">\n')
-        for keyID, key in enumerate(selectedObjectsPath ):
-            f.write('        <value Index="')
-            f.write('%d" />' % (keyID)) #Writes index for the flag
-            f.write('" prm1="0f" prm2="0f">')
-
- 
-
 
 	
 		
