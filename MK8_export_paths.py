@@ -1254,15 +1254,34 @@ def write_some_data(context, filepath, use_some_setting):
         sce = bpy.context.scene
         ob = bpy.context.object
         my_frames = get_keyframes(selection)
-		
+	
+	
         def print_details(obj_list):
-            XRot = round(obj_list.rotation_euler.x, 2)
-            ZRot = round(obj_list.rotation_euler.z, 2)
-            YRot = round(-obj_list.rotation_euler.y, 2)
+            obj = bpy.context.active_object
+            context = bpy.context
+
+            mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
+
+            mat = mat_rot.to_4x4() #Lets turn this into a grid!
+            
+
+            #These are for normals
+			
+            matXRN = mat[2][0] #Write second row, first column
+            matYRN = mat[2][1] #Write second row, second column
+            matZRN = mat[2][2] #Write second row, third column
+		
+            matXN = round(matXRN, 3)
+            matYN = round(matYRN, 3)
+            matZN = round(matZRN, 3)
+			
+            XRot = round(obj_list.rotation_euler.x)
+            ZRot = round(obj_list.rotation_euler.z)
+            YRot = round(-obj_list.rotation_euler.y)
             xloc = round(obj_list.location.x, 2)
             yloc = round(-obj_list.location.y, 2)
-            zloc = round(obj_list.location.z, 2)		
-            f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(zloc) + 'f" z="' + str(yloc) + 'f" nx="1f" ny="0f" nz="0f" val="0" />')
+            zloc = round(obj_list.location.z, 2)			
+            f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(zloc) + 'f" z="' + str(yloc) + 'f" nx="' + str(matXN) + 'f" ny="' + str(matZN) + 'f" nz="' + str(matYN) + 'f" val="0" />')
 		
 		
 		
@@ -1316,6 +1335,68 @@ def write_some_data(context, filepath, use_some_setting):
 	
 
 
+
+	
+	
+	
+ #Paths 
+ 
+ #These need to be per key frame! Each object seoerates the value entries!
+    f.write('\n  <Path type="array">\n')
+
+    for obj in selection:
+        selectedObjectsPath  =  [key for key in keys]
+            #These are for normals
+			
+	
+        f.write('    <value Delete="false" IsClosed="false" RailType="0" UnitIdNum="3">\n')
+        f.write('      <PathPt type="array">\n')
+
+        
+		
+		#These need to be written for every frame between keyframes
+
+        sce = bpy.context.scene
+        ob = bpy.context.object
+        my_frames = get_keyframes(selection)
+	
+		
+
+		
+        for key in get_keyframes(selection):
+            bpy.context.scene.frame_set(key)
+            f.write('        <value prm1="0f" prm2="0f">')
+			
+
+			
+            XRot = round(obj.rotation_euler.x, 3)
+            ZRot = round(obj.rotation_euler.z, 3)
+            YRot = round(-obj.rotation_euler.y,3)
+            xloc = round(obj.location.x, 3)
+            yloc = round(-obj.location.y, 3)
+            zloc = round(obj.location.z, 3)
+
+	
+		
+ 
+            # Write Coordinates from item paths selected
+            f.write('\n          <Rotate X="')
+            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+            f.write('\n          <Translate X="')
+            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+            f.write('\n        </value>\n')
+ 
+ 
+        f.write('      </PathPt>')
+        f.write('\n    </value>\n')
+    f.write('  </Path>')
+	
+	
+	
+	
+	
+
+
 			
 			
 	
@@ -1323,8 +1404,6 @@ def write_some_data(context, filepath, use_some_setting):
     f.close()
  
     return {'FINISHED'}
-
-
 
 
 
