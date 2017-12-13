@@ -30,6 +30,223 @@ def write_some_data(context, filepath, use_some_setting):
         
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
     
+
+	
+    def Coordinates():
+        if obj.type != 'EMPTY': 
+             ScaleX = obj.scale.x * 2
+             ScaleY = obj.scale.y * 2
+             ScaleZ = obj.scale.z * 2
+        else:
+            ScaleX = obj.scale.x
+            ScaleY = obj.scale.y
+            ScaleZ = obj.scale.z
+ 
+        zscale = round(ScaleZ, 3)
+        yscale = round(ScaleX, 3)
+        xscale = round(ScaleX, 3)
+        XRot = round(obj.rotation_euler.x, 3)
+        ZRot = round(obj.rotation_euler.z, 3)
+        YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+        xloc = round(obj.location.x, 3)
+        yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+        zloc = round(obj.location.z, 3)
+ 
+        # Write Coordinates from lap paths selected
+        f.write('\n          <Rotate X="')
+        f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+        f.write('\n          <Scale X="')
+        f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
+        f.write('\n          <Translate X="')
+        f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+        f.write('\n        </value>\n')
+
+    def ReturnCoordinates():
+        mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
+
+        mat = mat_rot.to_4x4() #Lets turn this into a grid!
+        
+			#These are for tangents
+        matXR = mat[1][0] #Write second row, first column
+        matYR = mat[1][1] #Write second row, second column
+        matZR = mat[1][2] #Write second row, third column
+		
+        matX = round(matXR, 3)
+        matY = round(matYR, 3)
+        matZ = round(matZR, 3)
+
+        #These are for normals
+			
+        matXRN = mat[2][0] #Write second row, first column
+        matYRN = mat[2][1] #Write second row, second column
+        matZRN = mat[2][2] #Write second row, third column
+		
+        matXN = round(matXRN, 3)
+        matYN = round(matYRN, 3)
+        matZN = round(matZRN, 3)
+        f.write('        <value JugemIndex="-1" JugemPath="-1" ReturnType="-1" hasError="0">')
+ 
+        xloc = round(obj.location.x, 3)
+        yloc = round(-obj.location.y, 3)
+        zloc = round(obj.location.z, 3)
+ 
+        # Write Coordinates from lap paths selected
+        f.write('\n          <Normal X="' + str(matXN) + 'f" Y="' + str(matZN) + 'f" Z="' + str(matYN) + 'f" />')
+        f.write('\n          <Position X="')
+        f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+        f.write('\n          <Tangent X="' + str(matX) + 'f" Y="' + str(matZ) + 'f" Z="' + str(matY) + 'f" />')
+        f.write('\n        </value>\n')
+
+    def LoopedPathPTIDS():
+
+        f.write('          <NextPt type="array">\n')
+
+        var = range(0, 9)
+
+        # Write next lap path group ID
+				# Use UI setting if specified!
+				
+				
+				#Todo range these values
+        if obj.has_GroupConnection1 == True:
+            f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection2 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection2) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection3 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection3) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection4 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection4) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection5 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection5) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection6 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection6) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection7 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection7) + '"PtId="0" />\n')  # write the next group ID
+            if obj.has_GroupConnection8 == True:
+                f.write('            <value PathId="' + str(obj.GroupConnection8) + '"PtId="0" />\n')  # write the next group ID	
+					
+        else:
+            f.write('            <value PathId="')  # write the next group ID
+
+            if obj == selectedObjects[-1]:
+                if layerIndex == layerIndecies[-1]:
+                    f.write('0')
+                else:
+                    f.write('%d' % (groupIndex + 1))
+            else:
+                f.write('%d' % groupIndex)
+
+        # Write next lap path ID
+            f.write('" PtId="')
+
+            if obj == selectedObjects[-1]:
+                f.write('0" />\n')
+            else:
+                f.write('%d" />\n' % (objID + 1))
+
+            f.write('          </NextPt>\n')
+
+        # Write previous lap path group ID
+				
+				#If the previous group specifices the group ID, use that group's index
+        # if groupIndex == groupIndex[str(obj.GroupConnection1)]:
+            # f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
+
+
+				
+				
+        f.write('          <PrevPt type="array">\n')
+        f.write('            <value PathId="')  # write the next group ID
+				
+        if obj == selectedObjects[0]:
+            if layerIndex == layerIndecies[0]:
+                f.write('%d' %  (len(layerIndecies) - 1))
+            else:
+                f.write('%d' % (groupIndex - 1))
+        else:
+            f.write('%d' % groupIndex)
+
+    # Write previous lap path ID
+        f.write('" PtId="')
+
+        if obj == selectedObjects[0]:
+                f.write('%d" />' % (len(sOIPL) - 1))
+        else:
+            f.write('%d" />' % (objID - 1))
+
+        f.write('\n          </PrevPt>')
+	
+    def NoLoopPathPTIDS():
+        if obj == selectedObjects [-1]:
+             f.write('          <NextPt type="array" />\n')
+        else:
+            f.write('          <NextPt type="array">\n')
+
+        if obj == selectedObjects [-1]:
+                f.write('')  # Last Object does not loop so has no ID after
+        else:
+                f.write('            <value PathId="')  # write the next group ID
+                            
+        if obj == selectedObjects [-1]:
+            if layerIndex == layerIndecies[-1]:
+                f.write('')
+            else:
+                f.write('%d' % (groupIndex + 1))
+        else:
+            f.write('%d' % groupIndex)
+ 
+        if obj == selectedObjects [-1]:
+                f.write('')
+                                    
+        # Write next lap path ID
+        if obj == selectedObjects [-1]:
+            f.write('')  # Last Object does not loop so has no ID after
+        else:
+            f.write('" PtId="')
+ 
+        if obj == selectedObjects [-1]:
+            f.write('')
+        else:
+            f.write('%d" />' % (objID + 1))
+ 
+        if obj == selectedObjects [-1]:
+            f.write('')  # Last Object does not loop so has no ID after
+        else:
+            f.write('\n          </NextPt>\n')
+ 
+        # Write previous lap path group ID
+        if obj == selectedObjects [0]:
+                f.write('          <PrevPt type="array" />')
+        else:
+                f.write('          <PrevPt type="array">')
+                    
+        if obj == selectedObjects [0]:
+            f.write('')  # Last Object does not loop so has no ID before
+        else:
+            f.write('\n            <value PathId="')  # write the next group ID
+ 
+        if obj == selectedObjects [0]:
+                f.write('')
+        else:
+            f.write('%d' % groupIndex)
+ 
+        # Write previous lap path ID
+        if obj == selectedObjects [0]:
+            f.write('')  # Last Object does not loop so has no ID before
+        else:
+            f.write('" PtId="')
+ 
+        if obj == selectedObjects [0]:
+            f.write('')
+        else:
+            f.write('%d" />' % (objID - 1))
+                            
+                            
+        if obj == selectedObjects [0]:
+            f.write('')  # Last Object does not loop so has no ID before
+        else:
+             f.write('\n          </PrevPt>')
+ 
  
  
  #Enemy Paths
@@ -54,143 +271,16 @@ def write_some_data(context, filepath, use_some_setting):
  
         for objID, obj in enumerate(selectedObjects):
             f.write('        <value BattleFlag="' + str(obj.IntBattleFlag) + '" PathDir="' + str(obj.IntPathDir) + '" Priority="' + str(obj.PriorityEnum) + '">\n')
+	
             if use_some_setting.NOLOOP == False:
+                LoopedPathPTIDS()
 
-                f.write('          <NextPt type="array">\n')
-
-
-                # Write next enemy path group ID
-                f.write('            <value PathId="')  # write the next group ID
-
-                if obj == selectedObjects[-1]:
-                    if layerIndex == layerIndecies[-1]:
-                        f.write('0')
-                    else:
-                        f.write('%d' % (groupIndex + 1))
-                else:
-                    f.write('%d' % groupIndex)
-
-                # Write next enemy path ID
-                f.write('" PtId="')
-
-                if obj == selectedObjects[-1]:
-                    f.write('0" />')
-                else:
-                    f.write('%d" />' % (objID + 1))
-
-                f.write('\n          </NextPt>\n')
-
-                # Write previous enemy path group ID
-                f.write('          <PrevPt type="array">\n')
-                f.write('            <value PathId="')  # write the next group ID
-
-                if obj == selectedObjects[0]:
-                    if layerIndex == layerIndecies[0]:
-                        f.write('%d' %  (len(layerIndecies) - 1))
-                    else:
-                        f.write('%d' % (groupIndex - 1))
-                else:
-                    f.write('%d' % groupIndex)
-
-                # Write previous enemy path ID
-                f.write('" PtId="')
-
-                if obj == selectedObjects[0]:
-                        f.write('%d" />' % (len(sOIPL) - 1))
-                else:
-                    f.write('%d" />' % (objID - 1))
-
-                f.write('\n          </PrevPt>')
-				
-				
 				#NO LOOP
             else:
-                if obj == selectedObjects [-1]:
-                     f.write('          <NextPt type="array" />\n')
-                else:
-                    f.write('          <NextPt type="array">\n')
-					
-                if obj == selectedObjects [-1]:
-                        f.write('')  # Last Object does not loop so has no ID after
-                else:
-                        f.write('            <value PathId="')  # write the next group ID
-                                    
-                if obj == selectedObjects [-1]:
-                    if layerIndex == layerIndecies[-1]:
-                        f.write('')
-                    else:
-                        f.write('%d' % (groupIndex + 1))
-                else:
-                    f.write('%d' % groupIndex)
-     
-                if obj == selectedObjects [-1]:
-                        f.write('')
-                                            
-                # Write next lap path ID
-                if obj == selectedObjects [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-                else:
-                    f.write('" PtId="')
-     
-                if obj == selectedObjects [-1]:
-                    f.write('')
-                else:
-                    f.write('%d" />' % (objID + 1))
-     
-                if obj == selectedObjects [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-                else:
-                    f.write('\n          </NextPt>\n')
-     
-                # Write previous lap path group ID
-                if obj == selectedObjects [0]:
-                        f.write('          <PrevPt type="array" />')
-                else:
-                        f.write('          <PrevPt type="array">')
-                            
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                    f.write('\n            <value PathId="')  # write the next group ID
-     
-                if obj == selectedObjects [0]:
-                        f.write('')
-                else:
-                    f.write('%d' % groupIndex)
-     
-                # Write previous lap path ID
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                    f.write('" PtId="')
-     
-                if obj == selectedObjects [0]:
-                    f.write('')
-                else:
-                    f.write('%d" />' % (objID - 1))
-                                    
-                                    
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                     f.write('\n          </PrevPt>')
-                
- 
-
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,
-                         3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from lap paths selected
-            f.write('\n          <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n          <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n        </value>\n')
+                NoLoopPathPTIDS()
+            
+            #Write Coordinates for Translation, and Rotation
+            Coordinates()
 
  
         f.write('      </PathPt>\n')
@@ -238,24 +328,9 @@ def write_some_data(context, filepath, use_some_setting):
         for objID, obj in enumerate(selectedObjects):
             f.write('    <value CameraNum="' + str(obj.IntCameraNumIntro) + '" CameraTime="' + str(obj.IntCameraTimeIntro) + '" CameraType="' + str(obj.FollowCameraTypeIntro) + '" Camera_AtPath="' + str(obj.IntCamera_AtPathIntro) + '" Camera_Path="' + str(obj.IntCamera_PathIntro) + '" Fovy="' + str(obj.IntFovyIntro) + '" Fovy2="' + str(obj.IntFovy2Intro) + '" FovySpeed="' + str(obj.IntFovySpeedIntro) + '" UnitIdNum="' + str(obj.IntUnitIdNumIntro) + '">')
 			
-            zscale = round(obj.scale.z, 3)
-            yscale = round(obj.scale.y, 3)
-            xscale = round(obj.scale.x, 3)
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from item paths selected
-            f.write('\n      <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n      <Scale X="')
-            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
-            f.write('\n      <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n    </value>\n')
+            
+            #Write Coordinates for Scale, Translation, and Rotation
+            Coordinates()
  
 
  
@@ -303,139 +378,14 @@ def write_some_data(context, filepath, use_some_setting):
 
  
             if use_some_setting.NOLOOP == False:
-                f.write('          <NextPt type="array">\n')
-
-
-                # Write next enemy path group ID
-                f.write('            <value PathId="')  # write the next group ID
-
-                if obj == selectedObjects[-1]:
-                    if layerIndex == layerIndecies[-1]:
-                        f.write('0')
-                    else:
-                        f.write('%d' % (groupIndex + 1))
-                else:
-                    f.write('%d' % groupIndex)
-
-                # Write next enemy path ID
-                f.write('" PtId="')
-
-                if obj == selectedObjects[-1]:
-                    f.write('0" />')
-                else:
-                    f.write('%d" />' % (objID + 1))
-
-                f.write('\n          </NextPt>\n')
-
-                # Write previous enemy path group ID
-                f.write('          <PrevPt type="array">\n')
-                f.write('            <value PathId="')  # write the next group ID
-
-                if obj == selectedObjects[0]:
-                    if layerIndex == layerIndecies[0]:
-                        f.write('%d' %  (len(layerIndecies) - 1))
-                    else:
-                        f.write('%d' % (groupIndex - 1))
-                else:
-                    f.write('%d' % groupIndex)
-
-                # Write previous enemy path ID
-                f.write('" PtId="')
-
-                if obj == selectedObjects[0]:
-                        f.write('%d" />' % (len(sOIPL) - 1))
-                else:
-                    f.write('%d" />' % (objID - 1))
-
-                f.write('\n          </PrevPt>')
-				
+                LoopedPathPTIDS()
 
 				#NO LOOP
             else:
-                if obj == selectedObjects [-1]:
-                     f.write('          <NextPt type="array" />\n')
-                else:
-                    f.write('          <NextPt type="array">\n')
-
-                if obj == selectedObjects [-1]:
-                        f.write('')  # Last Object does not loop so has no ID after
-                else:
-                        f.write('            <value PathId="')  # write the next group ID
-                                    
-                if obj == selectedObjects [-1]:
-                    if layerIndex == layerIndecies[-1]:
-                        f.write('')
-                    else:
-                        f.write('%d' % (groupIndex + 1))
-                else:
-                    f.write('%d' % groupIndex)
-     
-                if obj == selectedObjects [-1]:
-                        f.write('')
-                                            
-                # Write next lap path ID
-                if obj == selectedObjects [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-                else:
-                    f.write('" PtId="')
-     
-                if obj == selectedObjects [-1]:
-                    f.write('')
-                else:
-                    f.write('%d" />' % (objID + 1))
-     
-                if obj == selectedObjects [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-                else:
-                    f.write('\n          </NextPt>\n')
-     
-                # Write previous lap path group ID
-                if obj == selectedObjects [0]:
-                        f.write('          <PrevPt type="array" />')
-                else:
-                        f.write('          <PrevPt type="array">')
-                            
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                    f.write('\n            <value PathId="')  # write the next group ID
-     
-                if obj == selectedObjects [0]:
-                        f.write('')
-                else:
-                    f.write('%d' % groupIndex)
-     
-                # Write previous lap path ID
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                    f.write('" PtId="')
-     
-                if obj == selectedObjects [0]:
-                    f.write('')
-                else:
-                    f.write('%d" />' % (objID - 1))
-                                    
-                                    
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                     f.write('\n          </PrevPt>')
- 
-
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from item paths selected
-            f.write('\n          <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n          <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n        </value>\n')
+                NoLoopPathPTIDS()
+            
+            #Write Coordinates for Translation, and Rotation
+            Coordinates()
  
         f.write('      </PathPt>\n')
  
@@ -475,14 +425,14 @@ def write_some_data(context, filepath, use_some_setting):
  
         if layerIndex == layerIndecies[0]:
             f.write('  <LapPath type="array">')
+            f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
 
  
         # Write the start of lap path group
         if layerIndex != layerIndecies[0]:
             f.write('    </value>')
-			
-		#Enable anti gravity anyways. These won't do anything without gravity paths
-        if obj.select:
+		#Enable anti gravity if one is selected. 
+        if obj.select and "gravity" in obj.name.lower():
                 f.write('\n    <value LapPathGroup="-1" ReturnPointsError="false" UnitIdNum="62">')
                 f.write('\n      <LapPath_GravityPath type="array">')
                 f.write('\n        <value>0</value>') #Todo figure out what this value does???? May be group related
@@ -500,238 +450,30 @@ def write_some_data(context, filepath, use_some_setting):
                 if obj == selectedObjects[0]:
                     if layerIndex == layerIndecies[0]:
                       f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="0" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
-                    else:		
-                      f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
+                    else:
+                        f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
                 else:
-                  f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
+                    f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
             else:
                   f.write('        <value CheckPoint="' + str(obj.IntCheckpoint) + '" ClipIdx="' + str(obj.IntClipIndx) + '" HeadLightSW="' + str(obj.HeadlightsEnum) + '" LapCheck="' + str(obj.IntLapCheck) + '" MapCameraFovy="' + str(obj.IntMapCameraFovy) + '" MapCameraY="' + str(obj.IntMapCameraY) + '" ReturnPosition="' + str(obj.IntReturnPosition) + '" SoundSW="' + str(obj.IntSoundSW) + '">\n')
 
 				  
-				  
+
             if use_some_setting.NOLOOP == False:
+                LoopedPathPTIDS()
 
-                f.write('          <NextPt type="array">\n')
-
-                var = range(0, 9)
-
-                # Write next lap path group ID
-				# Use UI setting if specified!
-				
-				
-				#Todo range these values
-                if obj.has_GroupConnection1 == True:
-                    f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection2 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection2) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection3 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection3) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection4 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection4) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection5 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection5) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection6 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection6) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection7 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection7) + '"PtId="0" />\n')  # write the next group ID
-                    if obj.has_GroupConnection8 == True:
-                        f.write('            <value PathId="' + str(obj.GroupConnection8) + '"PtId="0" />\n')  # write the next group ID	
-					
-                else:
-                    f.write('            <value PathId="')  # write the next group ID
-
-                    if obj == selectedObjects[-1]:
-                        if layerIndex == layerIndecies[-1]:
-                            f.write('0')
-                        else:
-                            f.write('%d' % (groupIndex + 1))
-                    else:
-                        f.write('%d' % groupIndex)
-
-                # Write next lap path ID
-                    f.write('" PtId="')
-
-                    if obj == selectedObjects[-1]:
-                        f.write('0" />\n')
-                    else:
-                        f.write('%d" />\n' % (objID + 1))
-
-                    f.write('          </NextPt>\n')
-
-                # Write previous lap path group ID
-				
-				#If the previous group specifices the group ID, use that group's index
-                # if groupIndex == groupIndex[str(obj.GroupConnection1)]:
-                    # f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
-
-
-				
-				
-                f.write('          <PrevPt type="array">\n')
-                f.write('            <value PathId="')  # write the next group ID
-				
-                if obj == selectedObjects[0]:
-                    if layerIndex == layerIndecies[0]:
-                        f.write('%d' %  (len(layerIndecies) - 1))
-                    else:
-                        f.write('%d' % (groupIndex - 1))
-                else:
-                    f.write('%d' % groupIndex)
-
-            # Write previous lap path ID
-                f.write('" PtId="')
-
-                if obj == selectedObjects[0]:
-                        f.write('%d" />' % (len(sOIPL) - 1))
-                else:
-                    f.write('%d" />' % (objID - 1))
-
-                f.write('\n          </PrevPt>')
-				
-				
 				#NO LOOP
             else:
-                if obj == selectedObjects [-1]:
-                     f.write('          <NextPt type="array" />\n')
-                else:
-                    f.write('          <NextPt type="array">\n')
-
-                if obj == selectedObjects [-1]:
-                        f.write('')  # Last Object does not loop so has no ID after
-                else:
-                        f.write('            <value PathId="')  # write the next group ID
-                                    
-                if obj == selectedObjects [-1]:
-                    if layerIndex == layerIndecies[-1]:
-                        f.write('')
-                    else:
-                        f.write('%d' % (groupIndex + 1))
-                else:
-                    f.write('%d' % groupIndex)
-     
-                if obj == selectedObjects [-1]:
-                        f.write('')
-                                            
-                # Write next lap path ID
-                if obj == selectedObjects [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-                else:
-                    f.write('" PtId="')
-     
-                if obj == selectedObjects [-1]:
-                    f.write('')
-                else:
-                    f.write('%d" />' % (objID + 1))
-     
-                if obj == selectedObjects [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-                else:
-                    f.write('\n          </NextPt>\n')
-     
-                # Write previous lap path group ID
-                if obj == selectedObjects [0]:
-                        f.write('          <PrevPt type="array" />')
-                else:
-                        f.write('          <PrevPt type="array">')
-                            
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                    f.write('\n            <value PathId="')  # write the next group ID
-     
-                if obj == selectedObjects [0]:
-                        f.write('')
-                else:
-                    f.write('%d' % groupIndex)
-     
-                # Write previous lap path ID
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                    f.write('" PtId="')
-     
-                if obj == selectedObjects [0]:
-                    f.write('')
-                else:
-                    f.write('%d" />' % (objID - 1))
-                                    
-                                    
-                if obj == selectedObjects [0]:
-                    f.write('')  # Last Object does not loop so has no ID before
-                else:
-                     f.write('\n          </PrevPt>')
+                NoLoopPathPTIDS()
             
-            #Scale paths as they are smaller for some reason
-            if obj.type != 'EMPTY': 
-                 ScaleX = obj.scale.x * 2
-                 ScaleY = obj.scale.y * 2
-                 ScaleZ = obj.scale.z * 2
-            else:
-                ScaleX = obj.scale.x
-                ScaleY = obj.scale.y
-                ScaleZ = obj.scale.z
-				
-			
-            zscale = round(ScaleZ, 3)
-            yscale = round(ScaleY, 3)
-            xscale = round(ScaleX, 3)
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
- 
-            # Write Coordinates from lap paths selected
-            f.write('\n          <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n          <Scale X="')
-            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')		
-            f.write('\n          <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n        </value>\n')
+            #Write Coordinates for Scale, Translation, and Rotation
+            Coordinates()
 
         f.write('      </PathPt>\n')
         f.write('      <ReturnPoints type="array">\n')
  
         for obj in selectedObjects:
-		
-		
-            mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
-
-            mat = mat_rot.to_4x4() #Lets turn this into a grid!
-            
-			#These are for tangents
-            matXR = mat[1][0] #Write second row, first column
-            matYR = mat[1][1] #Write second row, second column
-            matZR = mat[1][2] #Write second row, third column
-		
-            matX = round(matXR, 3)
-            matY = round(matYR, 3)
-            matZ = round(matZR, 3)
-
-            #These are for normals
-			
-            matXRN = mat[2][0] #Write second row, first column
-            matYRN = mat[2][1] #Write second row, second column
-            matZRN = mat[2][2] #Write second row, third column
-		
-            matXN = round(matXRN, 3)
-            matYN = round(matYRN, 3)
-            matZN = round(matZRN, 3)
-            f.write('        <value JugemIndex="-1" JugemPath="-1" ReturnType="-1" hasError="0">')
- 
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from lap paths selected
-            f.write('\n          <Normal X="' + str(matXN) + 'f" Y="' + str(matZN) + 'f" Z="' + str(matYN) + 'f" />')
-            f.write('\n          <Position X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n          <Tangent X="' + str(matX) + 'f" Y="' + str(matZ) + 'f" Z="' + str(matY) + 'f" />')
-            f.write('\n        </value>\n')
+            ReturnCoordinates()
  
         f.write('      </ReturnPoints>\n')
 
@@ -792,105 +534,10 @@ def write_some_data(context, filepath, use_some_setting):
         for objID, obj in enumerate(selectedObjectsGCamera ):
             f.write('        <value>\n')
 
-            if obj == selectedObjectsGCamera [-1]:
-                    f.write('          <NextPt type="array" />\n')
-            else:
-                    f.write('          <NextPt type="array">\n')
-
- 
-            # Write next lap path group ID
-            if obj == selectedObjectsGCamera [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-            else:
-                    f.write('            <value PathId="')  # write the next group ID
-				
-            if obj == selectedObjectsGCamera [-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('')
-                else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
- 
-            if obj == selectedObjectsGCamera [-1]:
-                    f.write('')
-					
-            # Write next lap path ID
-            if obj == selectedObjectsGCamera [-1]:
-                f.write('')  # Last Object does not loop so has no ID after
-            else:
-                f.write('" PtId="')
- 
-            if obj == selectedObjectsGCamera [-1]:
-                f.write('')
-            else:
-                f.write('%d" />' % (objID + 1))
- 
-            if obj == selectedObjectsGCamera [-1]:
-                f.write('')  # Last Object does not loop so has no ID after
-            else:
-                f.write('\n          </NextPt>\n')
- 
-            # Write previous lap path group ID
-            if obj == selectedObjectsGCamera [0]:
-                    f.write('          <PrevPt type="array" />')
-            else:
-                    f.write('          <PrevPt type="array">')
-			
-            if obj == selectedObjectsGCamera [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                f.write('\n            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjectsGCamera [0]:
-                    f.write('')
-            else:
-                f.write('%d' % groupIndex)
- 
-            # Write previous lap path ID
-            if obj == selectedObjectsGCamera [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                f.write('" PtId="')
- 
-            if obj == selectedObjectsGCamera [0]:
-                f.write('')
-            else:
-                f.write('%d" />' % (objID - 1))
-				
-				
-            if obj == selectedObjectsGCamera [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                 f.write('\n          </PrevPt>')
- 
-            if obj.type != 'EMPTY': 
-                 ScaleX = obj.scale.x * 2
-                 ScaleY = obj.scale.y * 2
-                 ScaleZ = obj.scale.z * 2
-            else:
-                ScaleX = obj.scale.x
-                ScaleY = obj.scale.y
-                ScaleZ = obj.scale.z
- 
-            zscale = round(ScaleZ, 3)
-            yscale = round(ScaleX, 3)
-            xscale = round(ScaleX, 3)
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from lap paths selected
-            f.write('\n          <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n          <Scale X="')
-            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
-            f.write('\n          <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n        </value>\n')
+            NoLoopPathPTIDS()
+            
+            #Write Coordinates for Translation, and Rotation
+            Coordinates()
  
         f.write('      </PathPt>\n')
  
@@ -942,105 +589,10 @@ def write_some_data(context, filepath, use_some_setting):
         for objID, obj in enumerate(selectedObjectsGravity ):
             f.write('        <value CameraHeight="' + str(obj.IntCameraHeight) + '" GlideOnly="' + str(obj.GlideOnlyEnum) + '" Transform="' + str(obj.GTransformEnum) + '">\n')
 
-            if obj == selectedObjectsGravity [-1]:
-                    f.write('          <NextPt type="array" />\n')
-            else:
-                    f.write('          <NextPt type="array">\n')
-
- 
-            # Write next lap path group ID
-            if obj == selectedObjectsGravity [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-            else:
-                    f.write('            <value PathId="')  # write the next group ID
-				
-            if obj == selectedObjectsGravity [-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('')
-                else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
- 
-            if obj == selectedObjectsGravity [-1]:
-                    f.write('')
-					
-            # Write next lap path ID
-            if obj == selectedObjectsGravity [-1]:
-                f.write('')  # Last Object does not loop so has no ID after
-            else:
-                f.write('" PtId="')
- 
-            if obj == selectedObjectsGravity [-1]:
-                f.write('')
-            else:
-                f.write('%d" />' % (objID + 1))
- 
-            if obj == selectedObjectsGravity [-1]:
-                f.write('')  # Last Object does not loop so has no ID after
-            else:
-                f.write('\n          </NextPt>\n')
- 
-            # Write previous lap path group ID
-            if obj == selectedObjectsGravity [0]:
-                    f.write('          <PrevPt type="array" />')
-            else:
-                    f.write('          <PrevPt type="array">')
-			
-            if obj == selectedObjectsGravity [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                f.write('\n            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjectsGravity [0]:
-                    f.write('')
-            else:
-                f.write('%d' % groupIndex)
- 
-            # Write previous lap path ID
-            if obj == selectedObjectsGravity [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                f.write('" PtId="')
- 
-            if obj == selectedObjectsGravity [0]:
-                f.write('')
-            else:
-                f.write('%d" />' % (objID - 1))
-				
-				
-            if obj == selectedObjectsGravity [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                 f.write('\n          </PrevPt>')
- 
-            if obj.type != 'EMPTY': 
-                 ScaleX = obj.scale.x * 2
-                 ScaleY = obj.scale.y * 2
-                 ScaleZ = obj.scale.z * 2
-            else:
-                ScaleX = obj.scale.x
-                ScaleY = obj.scale.y
-                ScaleZ = obj.scale.z
- 
-            zscale = round(ScaleZ, 3)
-            yscale = round(ScaleX, 3)
-            xscale = round(ScaleX, 3)
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from lap paths selected
-            f.write('\n          <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n          <Scale X="')
-            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
-            f.write('\n          <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n        </value>\n')
+            NoLoopPathPTIDS()
+            
+            #Write Coordinates for Translation, and Rotation
+            Coordinates()
  
         f.write('      </PathPt>\n')
  
@@ -1090,103 +642,10 @@ def write_some_data(context, filepath, use_some_setting):
             else:
                     f.write('          <NextPt type="array">\n')
 
- 
-            # Write next lap path group ID
-            if obj == selectedObjectsGlider [-1]:
-                    f.write('')  # Last Object does not loop so has no ID after
-            else:
-                    f.write('            <value PathId="')  # write the next group ID
-				
-            if obj == selectedObjectsGlider [-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('')
-                else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
- 
-            if obj == selectedObjectsGlider [-1]:
-                    f.write('')
-					
-            # Write next lap path ID
-            if obj == selectedObjectsGlider [-1]:
-                f.write('')  # Last Object does not loop so has no ID after
-            else:
-                f.write('" PtId="')
- 
-            if obj == selectedObjectsGlider [-1]:
-                f.write('')
-            else:
-                f.write('%d" />' % (objID + 1))
- 
-            if obj == selectedObjectsGlider [-1]:
-                f.write('')  # Last Object does not loop so has no ID after
-            else:
-                f.write('\n          </NextPt>\n')
- 
-            # Write previous lap path group ID
-            if obj == selectedObjectsGlider [0]:
-                    f.write('          <PrevPt type="array" />')
-            else:
-                    f.write('          <PrevPt type="array">')
-			
-            if obj == selectedObjectsGlider [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                f.write('\n            <value PathId="')  # write the next group ID
- 
-            if obj == selectedObjectsGlider [0]:
-                    f.write('')
-            else:
-                f.write('%d' % groupIndex)
- 
-            # Write previous lap path ID
-            if obj == selectedObjectsGlider [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                f.write('" PtId="')
- 
-            if obj == selectedObjectsGlider [0]:
-                f.write('')
-            else:
-                f.write('%d" />' % (objID - 1))
-				
-				
-            if obj == selectedObjectsGlider [0]:
-                f.write('')  # Last Object does not loop so has no ID before
-            else:
-                 f.write('\n          </PrevPt>')
- 
- 
-            if obj.type != 'EMPTY': 
-                 ScaleX = obj.scale.x * 2
-                 ScaleY = obj.scale.y * 2
-                 ScaleZ = obj.scale.z * 2
-            else:
-                ScaleX = obj.scale.x
-                ScaleY = obj.scale.y
-                ScaleZ = obj.scale.z
- 
-            zscale = round(ScaleZ, 3)
-            yscale = round(ScaleX, 3)
-            xscale = round(ScaleX, 3)
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from lap paths selected
-            f.write('\n          <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n          <Scale X="')
-            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
-            f.write('\n          <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n        </value>\n')
- 
-        f.write('      </PathPt>\n')
+            NoLoopPathPTIDS()
+            
+            #Write Coordinates for Translation, and Rotation
+            Coordinates()
  
  
         if layerIndex != layerIndecies[-1]:
@@ -1332,25 +791,9 @@ def write_some_data(context, filepath, use_some_setting):
  
         for objID, obj in enumerate(selectedObjects):
             f.write('    <value AngleX="' + str(obj.IntAngleXReplay) + '" AngleY="' + str(obj.IntAngleYReplay) + '" AutoFovy="' + str(obj.AutoFovyEnumReplay) + '" CameraType="' + str(obj.CameraTypeEnumReplay) + '" Camera_Path="' + str(obj.IntCamera_PathReplay) + '" DepthOfField="' + str(obj.IntDepthOfFieldReplay) + '" Distance="' + str(obj.IntDistanceReplay) + '" Follow="' + str(obj.FollowEnumReplay) + '" Fovy="' + str(obj.IntFovyReplay) + '" Fovy2="' + str(obj.IntFovy2Replay) + '" FovySpeed="' + str(obj.IntFovySpeedReplay) + '" Group="' + str(obj.IntGroupReplay) + '" Pitch="' + str(obj.IntPitchReplay) + '" Roll="' + str(obj.IntRollReplay) + '" UnitIdNum="' + str(obj.IntUnitIdNumReplay) + '" Yaw="' + str(obj.IntYawReplay) + '" prm1="' + str(obj.Intprm1Replay) + '" prm2="' + str(obj.Intprm2Replay) + '">')
-
-            zscale = round(obj.scale.z, 3)
-            yscale = round(obj.scale.y, 3)
-            xscale = round(obj.scale.x, 3)
-            XRot = round(obj.rotation_euler.x, 3)
-            ZRot = round(obj.rotation_euler.z, 3)
-            YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            xloc = round(obj.location.x, 3)
-            yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-            zloc = round(obj.location.z, 3)
- 
-            # Write Coordinates from item paths selected
-            f.write('\n      <Rotate X="')
-            f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
-            f.write('\n      <Scale X="')
-            f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
-            f.write('\n      <Translate X="')
-            f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
-            f.write('\n    </value>\n')
+            
+            #Write Coordinates for Scale, Translation, and Rotation
+            Coordinates()
  
 
  
