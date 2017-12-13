@@ -39,6 +39,7 @@ This is a tool for exporting path data into a usable convertable XML format for 
 - ~~Export object path via key frame data~~
 - Viewable intro camera (possbily export off of keyframes too
 - Override ID system with UI (For more than 2 groups to branch out to)
+- Add beizer curves in addition for paths. These use control points so these are basically needed!
 
 ~~- UI for path properties~~
 
