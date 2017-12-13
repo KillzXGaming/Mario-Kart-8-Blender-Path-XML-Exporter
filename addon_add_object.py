@@ -40,24 +40,6 @@ from bpy.types import (Panel,
 
 
 					   
-# def HeadlightsToggle
-    # scene = bpy.context.scene
-    # unhide_objects()
-    # for ob in bpy.context.screen.scene.objects:
-        # if ob.name.startswith(str(scene.TestStringProp)):
-            # ob.hide = True
-        # else:
-            # ob.hide = False
-    # if not scene.TestBool:
-        # unhide_objects()
-
-# def initproplights():
-    # bpy.types.Scene.TestBool = bpy.props.BoolProperty(
-        # name="Hide", 
-        # description="", 
-        # default=False, 
-        # subtype='NONE', 
-        # update=HeadlightsToggle)
 
 
 #Hide/Unhide Lap Paths
@@ -136,6 +118,62 @@ def ToggleHideGlide(self, context):
 
 	
 def initprop():
+
+
+    GroupConnection1 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection2 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection3 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection4 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection5 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection6 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection7 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    GroupConnection8 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+
+
+    has_GroupConnection1 = bpy.props.BoolProperty(name="Group Connect 1",default=False,subtype='NONE',)
+		
+    has_GroupConnection2 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+		
+    has_GroupConnection3 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+		
+    has_GroupConnection4 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+		
+    has_GroupConnection5 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+		
+    has_GroupConnection6 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+		
+    has_GroupConnection7 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+		
+    has_GroupConnection8 = bpy.props.BoolProperty(
+        name="Group Connect 1", 
+        description="", 
+        default=False, 
+        subtype='NONE',)
+
     bpy.types.Scene.TestBool = bpy.props.BoolProperty(
         name="Hide Lap Paths", 
         description="", 
@@ -223,8 +261,8 @@ def initprop():
 	default=-1)
 
     bpy.types.Object.IntLapCheck = bpy.props.IntProperty(
-	name="Lap Check",
-	description="Counts a lap passed. Looped track uses 0 for first path!",
+	name="Lap Number",
+	description="Counts a lap passed. Looped track uses 0 for first path! Non looped paths keep increasing from 0",
 	min=-1, max=7,
 	default=-1)
 
@@ -523,6 +561,8 @@ def initprop():
 	min=-131000, max=-131120,
 	default=131096)
 	
+    bpy.types.Object.NextGroupIDAdder = bpy.props.BoolProperty(name="Connect Group", description="Allows you to connect a path to multiple groups (in layers)")
+	
 def delprop():
     del bpy.types.Scene.TestBool
     del bpy.types.Scene.TestStringProp	    
@@ -588,7 +628,22 @@ def delprop():
     del bpy.types.Object.IntFovy2Intro
     del bpy.types.Object.IntFovySpeedIntro
     del bpy.types.Object.IntUnitIdNumIntro
-
+    del GroupConnection1
+    del GroupConnection2
+    del GroupConnection3
+    del GroupConnection4
+    del GroupConnection5
+    del GroupConnection6
+    del GroupConnection7
+    del GroupConnection8
+    del has_GroupConnection1
+    del has_GroupConnection2
+    del has_GroupConnection3
+    del has_GroupConnection4
+    del has_GroupConnection5
+    del has_GroupConnection6
+    del has_GroupConnection7
+    del has_GroupConnection8
 
 	
 class gliderselect(bpy.types.Operator):
@@ -740,11 +795,38 @@ class LaptoGravity(bpy.types.Operator):
                               
         return {'FINISHED'} 
 		
+class Lap2LapDEBUG(bpy.types.Operator):
+    bl_idname = "lap.lapdebug"
+    bl_label = "LaptoLap"
+
+ 
+    def execute(self, context):	
+
+
+
+        
+        
+        selected_objects = sorted(bpy.context.selected_objects, key=lambda obj: obj.name)
+
+        for ob in context.selected_objects:
+            if ob.name.startswith("Lap"):
+                bpy.ops.mesh.add_lap() #Adds a temporary gravity path for replacing
+                mesh = bpy.data.meshes["Lap Path"]
+                context.object.name = "TEMP"
+                ob.data = mesh
+                ob.name = ob.name.replace("Lap", "Lap")
+				
+                objs = bpy.data.objects
+                objs.remove(objs["TEMP"], True) #Removes a temporary gravity path for replacing
+                              
+        return {'FINISHED'} 
+		
 class ObjectPanel(bpy.types.Panel):
     bl_label = "MK8 Path Settings"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "object"
+ 
  
     def draw(self, context):
         scene = context.scene
@@ -767,14 +849,47 @@ class ObjectPanel(bpy.types.Panel):
         col = layout.column(align=True)
         col.scale_y = 1.5
         if context.object.name.startswith("Lap"):
+            obj = context.object
+            box = layout.box()
+            row = box.row()
+
+            row.prop(obj, "expanded",text="Groups Connected",icon="TRIA_DOWN" if obj.expanded else "TRIA_RIGHT",icon_only=True, emboss=False)
+
+			
+            if obj.expanded:
+                row = box.row()
+				
+                self._optional_prop(obj, row, "GroupConnection1")
+                self._optional_prop(obj, row, "GroupConnection2")
+                row = box.row()
+                self._optional_prop(obj, row, "GroupConnection3")
+                self._optional_prop(obj, row, "GroupConnection4")
+                row = box.row()
+                self._optional_prop(obj, row, "GroupConnection5")
+                self._optional_prop(obj, row, "GroupConnection6")
+                row = box.row()
+                self._optional_prop(obj, row, "GroupConnection7")
+                self._optional_prop(obj, row, "GroupConnection8")
+                row = box.row()
+
+            row = box.row()
+            split = row.split(align=True)
+            col = split.column(align=True)
+            col.scale_y = 1.5
+            col.prop(obj, "IntLapCheck")
             col.prop(obj, "IntCheckpoint")
             row = layout.row()
-            col.prop(obj, "IntLapCheck")
             col.prop(obj, "IntReturnPosition")
             col.prop(obj, "IntSoundSW")
             col.prop(obj, "IntMapCameraY")
             col.prop(obj, "IntMapCameraFovy")
             col.prop(obj, "IntClipIndx")
+            
+
+
+
+			
+			
         if context.object.name.startswith("Gravity"):
             col.prop(obj, "GlideOnlyEnum")
             col.prop(obj, "GTransformEnum")
@@ -819,9 +934,19 @@ class ObjectPanel(bpy.types.Panel):
             col.prop(obj, "IntFovy2Intro")	
             col.prop(obj, "IntFovySpeedIntro")
             col.prop(obj, "IntUnitIdNumIntro")	
-			
+		
 
- 
+    def _optional_prop(self, obj, layout, path):
+        row = layout.row(align=True)
+        row.prop(obj, "has_{}".format(path), text="")
+        sub = row.row(align=True)
+        sub.active = getattr(obj, "has_{}".format(path))
+        sub.prop(obj, path)
+
+
+		
+		
+
 		
 class VIEW3D_PT_Blank1_Blank2(Panel):
     bl_idname = "OBJECT_PT_my_panel"
@@ -861,6 +986,7 @@ class VIEW3D_PT_Blank1_Blank2(Panel):
         row = layout.row()
         row.scale_y = 1.5
         row.operator("lap.gravity" , text="Lap2Gravity")
+        row.operator("lap.lapdebug" , text="Lap2LapDEBUG")
         row = layout.row()
        # row.operator("object.lamp_add(type='HEMI'), text="Add Hemisphere")
         row = layout.row()
@@ -880,17 +1006,10 @@ class VIEW3D_PT_Blank1_Blank2(Panel):
 def add_object(self, context):
 
 
-    verts = [Vector((-1.0, 0, -1.0)),
-             Vector((-1.0, 0, 1.0)), 
-             Vector((1.0, 0, -1.0)), 
-             Vector((1.0, 0, 1.0)), 
-             Vector((-1.0, 0.01, -1.0)), 
-             Vector((-1.0, 0.01, 1.0)), 
-             Vector((1.0, 0.01, -1.0)), 
-             Vector((1.0, 0.01, 1.0))]
+    verts = [Vector((0.03697787597775459, -0.12259385734796524, -0.03275391831994057)), Vector((0.03697787597775459, -0.12259385734796524, 0.03152165189385414)), Vector((0.042630307376384735, -0.006925363093614578, -0.03625251725316048)), Vector((0.042630307376384735, -0.006925363093614578, 0.03502025082707405)), Vector((-0.036710888147354126, -0.12154867500066757, -0.03275391831994057)), Vector((-0.03671089559793472, -0.12154869735240936, 0.03152165189385414)), Vector((-0.03908053785562515, -0.005766437854617834, -0.03625251725316048)), Vector((-0.03908053785562515, -0.005766437854617834, 0.03502025082707405)), Vector((0.06638090312480927, -0.11169087141752243, -0.05826086178421974)), Vector((0.06638089567422867, -0.11169087886810303, 0.057028595358133316)), Vector((-0.06579288840293884, -0.10981625318527222, 0.057028595358133316)), Vector((-0.06579288840293884, -0.10981625318527222, -0.05826086178421974)), Vector((0.005754197482019663, -0.25201401114463806, -0.007125174161046743)), Vector((0.005754197482019663, -0.25201401114463806, 0.005892908200621605)), Vector((-0.009170334786176682, -0.2518024146556854, 0.005892908200621605)), Vector((-0.009170334786176682, -0.2518024146556854, -0.007125174161046743)), Vector((-0.9999999403953552, -0.04259553551673889, -0.9999999403953552)), Vector((-0.9999999403953552, -0.04259553551673889, 0.9999999403953552)), Vector((1.0, -0.04259558022022247, -0.9999999403953552)), Vector((1.0, -0.04259558022022247, 0.9999999403953552)), Vector((-0.9999999403953552, 0.04030923545360565, -0.9999999403953552)), Vector((-0.9999999403953552, 0.04030923545360565, 0.9999999403953552)), Vector((1.0000001192092896, 0.04030919447541237, -0.9999999403953552)), Vector((1.0000001192092896, 0.04030919447541237, 0.9999999403953552))]
     
     edges = []
-    faces = [(2, 3, 1, 0), (6, 7, 5, 4), (7, 3, 1, 5)]
+    faces = [(0, 1, 3, 2), (2, 3, 7, 6), (6, 7, 5, 4), (4, 5, 10, 11), (2, 6, 4, 0), (7, 3, 1, 5), (8, 11, 15, 12), (1, 0, 8, 9), (0, 4, 11, 8), (5, 1, 9, 10), (15, 14, 13, 12), (9, 8, 12, 13), (10, 9, 13, 14), (11, 10, 14, 15), (18, 19, 17, 16), (22, 23, 21, 20), (23, 19, 17, 21), (21, 17, 16, 20), (19, 23, 22, 18)]
 	
     mesh = bpy.data.meshes.new(name="Lap Path")
     mesh.from_pydata(verts, edges, faces)
@@ -904,17 +1023,11 @@ def add_object(self, context):
 def add_object1(self, context):
 
 
-    verts = [Vector((-1.0, 0, -1.0)),
-             Vector((-1.0, 0, 1.0)), 
-             Vector((1.0, 0, -1.0)), 
-             Vector((1.0, 0, 1.0)), 
-             Vector((-1.0, 0.01, -1.0)), 
-             Vector((-1.0, 0.01, 1.0)), 
-             Vector((1.0, 0.01, -1.0)), 
-             Vector((1.0, 0.01, 1.0))]
+    verts = [Vector((0.03697787597775459, -0.12259385734796524, -0.03275391831994057)), Vector((0.03697787597775459, -0.12259385734796524, 0.03152165189385414)), Vector((0.042630307376384735, -0.006925363093614578, -0.03625251725316048)), Vector((0.042630307376384735, -0.006925363093614578, 0.03502025082707405)), Vector((-0.036710888147354126, -0.12154867500066757, -0.03275391831994057)), Vector((-0.03671089559793472, -0.12154869735240936, 0.03152165189385414)), Vector((-0.03908053785562515, -0.005766437854617834, -0.03625251725316048)), Vector((-0.03908053785562515, -0.005766437854617834, 0.03502025082707405)), Vector((0.06638090312480927, -0.11169087141752243, -0.05826086178421974)), Vector((0.06638089567422867, -0.11169087886810303, 0.057028595358133316)), Vector((-0.06579288840293884, -0.10981625318527222, 0.057028595358133316)), Vector((-0.06579288840293884, -0.10981625318527222, -0.05826086178421974)), Vector((0.005754197482019663, -0.25201401114463806, -0.007125174161046743)), Vector((0.005754197482019663, -0.25201401114463806, 0.005892908200621605)), Vector((-0.009170334786176682, -0.2518024146556854, 0.005892908200621605)), Vector((-0.009170334786176682, -0.2518024146556854, -0.007125174161046743)), Vector((-0.9999999403953552, -0.04259553551673889, -0.9999999403953552)), Vector((-0.9999999403953552, -0.04259553551673889, 0.9999999403953552)), Vector((1.0, -0.04259558022022247, -0.9999999403953552)), Vector((1.0, -0.04259558022022247, 0.9999999403953552)), Vector((-0.9999999403953552, 0.04030923545360565, -0.9999999403953552)), Vector((-0.9999999403953552, 0.04030923545360565, 0.9999999403953552)), Vector((1.0000001192092896, 0.04030919447541237, -0.9999999403953552)), Vector((1.0000001192092896, 0.04030919447541237, 0.9999999403953552))]
     
     edges = []
-    faces = [(2, 3, 1, 0), (6, 7, 5, 4), (7, 3, 1, 5)]
+    faces = [(0, 1, 3, 2), (2, 3, 7, 6), (6, 7, 5, 4), (4, 5, 10, 11), (2, 6, 4, 0), (7, 3, 1, 5), (8, 11, 15, 12), (1, 0, 8, 9), (0, 4, 11, 8), (5, 1, 9, 10), (15, 14, 13, 12), (9, 8, 12, 13), (10, 9, 13, 14), (11, 10, 14, 15), (18, 19, 17, 16), (22, 23, 21, 20), (23, 19, 17, 21), (21, 17, 16, 20), (19, 23, 22, 18)]
+	
 
     mesh = bpy.data.meshes.new(name="Gravity Path")
     mesh.from_pydata(verts, edges, faces)
@@ -926,17 +1039,11 @@ def add_object1(self, context):
 def add_object2(self, context):
 
 
-    verts = [Vector((-1.0, 0, -1.0)),
-             Vector((-1.0, 0, 1.0)), 
-             Vector((1.0, 0, -1.0)), 
-             Vector((1.0, 0, 1.0)), 
-             Vector((-1.0, 0.01, -1.0)), 
-             Vector((-1.0, 0.01, 1.0)), 
-             Vector((1.0, 0.01, -1.0)), 
-             Vector((1.0, 0.01, 1.0))]
+    verts = [Vector((0.03697787597775459, -0.12259385734796524, -0.03275391831994057)), Vector((0.03697787597775459, -0.12259385734796524, 0.03152165189385414)), Vector((0.042630307376384735, -0.006925363093614578, -0.03625251725316048)), Vector((0.042630307376384735, -0.006925363093614578, 0.03502025082707405)), Vector((-0.036710888147354126, -0.12154867500066757, -0.03275391831994057)), Vector((-0.03671089559793472, -0.12154869735240936, 0.03152165189385414)), Vector((-0.03908053785562515, -0.005766437854617834, -0.03625251725316048)), Vector((-0.03908053785562515, -0.005766437854617834, 0.03502025082707405)), Vector((0.06638090312480927, -0.11169087141752243, -0.05826086178421974)), Vector((0.06638089567422867, -0.11169087886810303, 0.057028595358133316)), Vector((-0.06579288840293884, -0.10981625318527222, 0.057028595358133316)), Vector((-0.06579288840293884, -0.10981625318527222, -0.05826086178421974)), Vector((0.005754197482019663, -0.25201401114463806, -0.007125174161046743)), Vector((0.005754197482019663, -0.25201401114463806, 0.005892908200621605)), Vector((-0.009170334786176682, -0.2518024146556854, 0.005892908200621605)), Vector((-0.009170334786176682, -0.2518024146556854, -0.007125174161046743)), Vector((-0.9999999403953552, -0.04259553551673889, -0.9999999403953552)), Vector((-0.9999999403953552, -0.04259553551673889, 0.9999999403953552)), Vector((1.0, -0.04259558022022247, -0.9999999403953552)), Vector((1.0, -0.04259558022022247, 0.9999999403953552)), Vector((-0.9999999403953552, 0.04030923545360565, -0.9999999403953552)), Vector((-0.9999999403953552, 0.04030923545360565, 0.9999999403953552)), Vector((1.0000001192092896, 0.04030919447541237, -0.9999999403953552)), Vector((1.0000001192092896, 0.04030919447541237, 0.9999999403953552))]
     
     edges = []
-    faces = [(2, 3, 1, 0), (6, 7, 5, 4), (7, 3, 1, 5)]
+    faces = [(0, 1, 3, 2), (2, 3, 7, 6), (6, 7, 5, 4), (4, 5, 10, 11), (2, 6, 4, 0), (7, 3, 1, 5), (8, 11, 15, 12), (1, 0, 8, 9), (0, 4, 11, 8), (5, 1, 9, 10), (15, 14, 13, 12), (9, 8, 12, 13), (10, 9, 13, 14), (11, 10, 14, 15), (18, 19, 17, 16), (22, 23, 21, 20), (23, 19, 17, 21), (21, 17, 16, 20), (19, 23, 22, 18)]
+	
 
     mesh = bpy.data.meshes.new(name="Glide Path")
     mesh.from_pydata(verts, edges, faces)
@@ -960,33 +1067,75 @@ class Add_LapPath(Operator, AddObjectHelper):
         
         add_object(self, context)
 		
+    #Mat F index List
+    #Green:15,17,18,14
+    #Blue:16
+
+
+
+
         scene = context.scene
         obj = scene.objects.active
 		
         activeObject = scene.objects.active #Set active object to variable
-        mat = bpy.data.materials.new(name="Front") #set new material to variable
+        mat = bpy.data.materials.new(name="Arrow") #set new material to variable
         activeObject.data.materials.append(mat) #add the material to the object
+        bpy.context.object.active_material_index = 0 #Active the first material
         bpy.context.object.active_material.diffuse_color = (1, 0.006883, 0) #Color Red 
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
-        activeObject.data.polygons[1].select = True  #Active polygon
-        
         me = obj.data
-        
-        for f in me.polygons:
-         f.material_index = f.index % 3
 
-        mat1 = bpy.data.materials.new(name="Back") #set new material to variable
+         # and Assign materials to faces
+        listface=[0,1,2,3,4,5,6,7,8,9,10,11,12,19,20,21]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 0
+
+        mat1 = bpy.data.materials.new(name="Main") #set new material to variable
         activeObject.data.materials.append(mat1) #add the material to the object  
         bpy.context.object.active_material_index = 1 #Active the second material
         bpy.context.object.active_material.diffuse_color = (0, 1, 0.076676) #Color Green
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
 		
+        me = obj.data
 
-        
+         # and Assign materials to faces
+        listface=[15, 17, 18, 14]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 1
 
-    
+        mat2 = bpy.data.materials.new(name="Top") #set new material to variable
+        activeObject.data.materials.append(mat2) #add the material to the object  
+        bpy.context.object.active_material_index = 2 #Active the second material
+        bpy.context.object.active_material.diffuse_color = (0, 0.001, 0.8) #Color blue
+        bpy.context.object.active_material.specular_intensity = 0
+        bpy.context.object.active_material.use_transparency = True
+        bpy.context.object.active_material.alpha = (0.4) #Transparent Amount    
+        me = obj.data
+
+         # and Assign materials to faces
+        listface=[16]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 2
+
         return {'FINISHED'}
 	
 class Add_GravityPath(Operator, AddObjectHelper):
@@ -1008,38 +1157,63 @@ class Add_GravityPath(Operator, AddObjectHelper):
         obj = scene.objects.active
 		
         activeObject = scene.objects.active #Set active object to variable
-        mat = bpy.data.materials.new(name="Front1") #set new material to variable
+        mat = bpy.data.materials.new(name="Arrow") #set new material to variable
         activeObject.data.materials.append(mat) #add the material to the object
+        bpy.context.object.active_material_index = 0 #Active the first material
         bpy.context.object.active_material.diffuse_color = (1, 0.006883, 0) #Color Red 
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
-        activeObject.data.polygons[1].select = True  #Active polygon
-        
         me = obj.data
-        
-        for f in me.polygons:
-         f.material_index = f.index % 3
 
-        mat1 = bpy.data.materials.new(name="Back1") #set new material to variable
+         # and Assign materials to faces
+        listface=[0,1,2,3,4,5,6,7,8,9,10,11,12,19,20,21]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 0
+
+        mat1 = bpy.data.materials.new(name="Main") #set new material to variable
         activeObject.data.materials.append(mat1) #add the material to the object  
         bpy.context.object.active_material_index = 1 #Active the second material
-        bpy.context.object.active_material.diffuse_color = (0.225547,0, 1) #Color Green
+        bpy.context.object.active_material.diffuse_color = (0.49473, 0, 1) #Color Purple
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
 		
-        activeObject.data.polygons[2].select = True  #Active polygon
-        
         me = obj.data
-        
-        for f in me.polygons:
-         f.material_index = f.index % 3
 
-        mat1 = bpy.data.materials.new(name="Back") #set new material to variable
-        activeObject.data.materials.append(mat1) #add the material to the object  
-        bpy.context.object.active_material_index = 1 #Active the second material
-        bpy.context.object.active_material.diffuse_color = (0.225547,0, 1) #Color Green
+         # and Assign materials to faces
+        listface=[15, 17, 18, 14]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 1
+
+        mat2 = bpy.data.materials.new(name="Top") #set new material to variable
+        activeObject.data.materials.append(mat2) #add the material to the object  
+        bpy.context.object.active_material_index = 2 #Active the second material
+        bpy.context.object.active_material.diffuse_color = (0.8, 0, 0.488136) #Color light purple
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
-        bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
+        bpy.context.object.active_material.alpha = (0.4) #Transparent Amount    
+        me = obj.data
+
+         # and Assign materials to faces
+        listface=[16]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 2
         
     
         return {'FINISHED'}
@@ -1068,38 +1242,63 @@ class Add_GlidePath(Operator, AddObjectHelper):
         obj = scene.objects.active
 		
         activeObject = scene.objects.active #Set active object to variable
-        mat = bpy.data.materials.new(name="Front") #set new material to variable
+        mat = bpy.data.materials.new(name="Arrow") #set new material to variable
         activeObject.data.materials.append(mat) #add the material to the object
+        bpy.context.object.active_material_index = 0 #Active the first material
         bpy.context.object.active_material.diffuse_color = (1, 0.006883, 0) #Color Red 
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
-        activeObject.data.polygons[1].select = True  #Active polygon
-        
         me = obj.data
-        
-        for f in me.polygons:
-         f.material_index = f.index % 3
 
-        mat1 = bpy.data.materials.new(name="Back") #set new material to variable
+         # and Assign materials to faces
+        listface=[0,1,2,3,4,5,6,7,8,9,10,11,12,19,20,21]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 0
+
+        mat1 = bpy.data.materials.new(name="Main") #set new material to variable
         activeObject.data.materials.append(mat1) #add the material to the object  
         bpy.context.object.active_material_index = 1 #Active the second material
-        bpy.context.object.active_material.diffuse_color = (1,0.311029, 0) #Color Orange
+        bpy.context.object.active_material.diffuse_color = (1, 0.215964, 0) #Color Purple
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
         bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
 		
-        activeObject.data.polygons[2].select = True  #Active polygon
-        
         me = obj.data
-        
-        for f in me.polygons:
-         f.material_index = f.index % 3
 
-        mat1 = bpy.data.materials.new(name="Back") #set new material to variable
-        activeObject.data.materials.append(mat1) #add the material to the object  
-        bpy.context.object.active_material_index = 1 #Active the second material
-        bpy.context.object.active_material.diffuse_color = (1,0.311029, 0) #Color Orange
+         # and Assign materials to faces
+        listface=[15, 17, 18, 14]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 1
+
+        mat2 = bpy.data.materials.new(name="Top") #set new material to variable
+        activeObject.data.materials.append(mat2) #add the material to the object  
+        bpy.context.object.active_material_index = 2 #Active the second material
+        bpy.context.object.active_material.diffuse_color = (0.367237, 0.239103, 0) #Color yellow
+        bpy.context.object.active_material.specular_intensity = 0
         bpy.context.object.active_material.use_transparency = True
-        bpy.context.object.active_material.alpha = (0.4) #Transparent Amount
+        bpy.context.object.active_material.alpha = (0.4) #Transparent Amount    
+        me = obj.data
+
+         # and Assign materials to faces
+        listface=[16]
+        # print (' len face =',len(listface))
+        for f in me.polygons:
+         
+         for j in range(0,len(listface)):
+         
+          if f.index==listface[j]:
+            f.material_index = 2
         
     
         return {'FINISHED'}	
@@ -1149,6 +1348,8 @@ def register():
     bpy.types.INFO_MT_file_export.append(menu_func_export)
     # bpy.types.Object.some_related_object = idproperty.ObjectIDProperty(name="something related")
     initprop()
+    bpy.types.Object.expanded = bpy.props.BoolProperty(default=True)
+
 
 
 def unregister():
@@ -1159,7 +1360,8 @@ def unregister():
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
     # del bpy.types.Object.some_related_object
     delprop()
-    
+    del bpy.types.Object.expanded
+   
 
 
 if __name__ == "__main__":
