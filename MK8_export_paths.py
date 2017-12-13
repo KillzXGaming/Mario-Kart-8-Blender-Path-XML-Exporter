@@ -39,7 +39,7 @@ def write_some_data(context, filepath, use_some_setting):
             layerIndecies.append(layerIndex)
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
+        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select] #No enemy path objects yet!
         sOIPL = [ob for ob in objects if ob.layers[layerIndecies[groupIndex - 1]] and  "lap" in ob.name.lower() and ob.select]
 		
         # Write the start of enemy path group
@@ -203,7 +203,6 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('    </value>\n')
             f.write('  </EnemyPath>\n')
  
-    f.write('  <FirstCurve type="string">right</FirstCurve>\n')
  
  
  
@@ -233,7 +232,7 @@ def write_some_data(context, filepath, use_some_setting):
         # Write the start of intro path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <IntroCamera type="array">\n')
+            f.write('  <IntroCamera type="array">\n')
 		
  
         for objID, obj in enumerate(selectedObjects):
@@ -514,32 +513,63 @@ def write_some_data(context, filepath, use_some_setting):
 
                 f.write('          <NextPt type="array">\n')
 
+                var = range(0, 9)
 
-                # Write next enemy path group ID
-                f.write('            <value PathId="')  # write the next group ID
+                # Write next lap path group ID
+				# Use UI setting if specified!
+				
+				
+				#Todo range these values
+                if obj.has_GroupConnection1 == True:
+                    f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection2 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection2) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection3 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection3) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection4 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection4) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection5 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection5) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection6 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection6) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection7 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection7) + '"PtId="0" />\n')  # write the next group ID
+                    if obj.has_GroupConnection8 == True:
+                        f.write('            <value PathId="' + str(obj.GroupConnection8) + '"PtId="0" />\n')  # write the next group ID	
+					
+                else:
+                    f.write('            <value PathId="')  # write the next group ID
 
-                if obj == selectedObjects[-1]:
-                    if layerIndex == layerIndecies[-1]:
-                        f.write('0')
+                    if obj == selectedObjects[-1]:
+                        if layerIndex == layerIndecies[-1]:
+                            f.write('0')
+                        else:
+                            f.write('%d' % (groupIndex + 1))
                     else:
-                        f.write('%d' % (groupIndex + 1))
-                else:
-                    f.write('%d' % groupIndex)
+                        f.write('%d' % groupIndex)
 
-                # Write next enemy path ID
-                f.write('" PtId="')
+                # Write next lap path ID
+                    f.write('" PtId="')
 
-                if obj == selectedObjects[-1]:
-                    f.write('0" />')
-                else:
-                    f.write('%d" />' % (objID + 1))
+                    if obj == selectedObjects[-1]:
+                        f.write('0" />\n')
+                    else:
+                        f.write('%d" />\n' % (objID + 1))
 
-                f.write('\n          </NextPt>\n')
+                    f.write('          </NextPt>\n')
 
-                # Write previous enemy path group ID
+                # Write previous lap path group ID
+				
+				#If the previous group specifices the group ID, use that group's index
+                # if groupIndex == groupIndex[str(obj.GroupConnection1)]:
+                    # f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
+
+
+				
+				
                 f.write('          <PrevPt type="array">\n')
                 f.write('            <value PathId="')  # write the next group ID
-
+				
                 if obj == selectedObjects[0]:
                     if layerIndex == layerIndecies[0]:
                         f.write('%d' %  (len(layerIndecies) - 1))
@@ -548,7 +578,7 @@ def write_some_data(context, filepath, use_some_setting):
                 else:
                     f.write('%d' % groupIndex)
 
-                # Write previous enemy path ID
+            # Write previous lap path ID
                 f.write('" PtId="')
 
                 if obj == selectedObjects[0]:
@@ -709,7 +739,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('')
         else:
             f.write('    </value>\n')
-            f.write('  </LapPath>')
+            f.write('  </LapPath>\n')
 	
 	
 	
@@ -747,7 +777,7 @@ def write_some_data(context, filepath, use_some_setting):
         # Write the start of lap path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <GCameraPath type="array">')
+            f.write('  <GCameraPath type="array">')
 
 
         if layerIndex != layerIndecies[-1]:
@@ -868,7 +898,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('')
         else:
             f.write('    </value>\n')
-            f.write('  </GCameraPath>')
+            f.write('  </GCameraPath>\n')
 	
 	
 	
@@ -897,7 +927,7 @@ def write_some_data(context, filepath, use_some_setting):
         # Write the start of lap path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <GravityPath type="array">')
+            f.write('  <GravityPath type="array">')
 
 
         if layerIndex != layerIndecies[-1]:
@@ -1018,7 +1048,7 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('')
         else:
             f.write('    </value>\n')
-            f.write('  </GravityPath>')
+            f.write('  </GravityPath>\n')
 	
 	
 	
@@ -1043,7 +1073,7 @@ def write_some_data(context, filepath, use_some_setting):
  
         # Write the start of lap path group
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <GlidePath type="array">')
+            f.write('  <GlidePath type="array">')
 		
         if layerIndex != layerIndecies[-1]:
             f.write('    </value>')
@@ -1163,100 +1193,119 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('')
         else:
             f.write('    </value>\n')
-            f.write('  </GlidePath>')
+            f.write('  </GlidePath>\n')
 
 	
 
 	
+    #Look for Rays byaml tool and look for has_obj_path (Bool) and obj_path (Int) and determine what order to sort the obj paths!
 	
 	
+
 	
-	
-	
-	
+ #ObjPaths 
+
+    obj = (bpy.context.scene.objects)
 
  #These need to be per key frame! Each object seoerates the value entries!
-#ObjPaths
-
-	
-	
-	
-	
-	
-	
-	
-	
-
-    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
+    OBJPathEnabled = [ o for o in bpy.context.scene.objects if o.select  and "test" in o.name.lower()]
+    Test = 'False'
  
-    # So now we will search for layers in the scene and group them!
- 
-    for obj in context.selected_objects:
-        print("-" * 30)
-        print(obj.name)
-        ad = obj.animation_data
-        if ad is None:
-            print("has no animation data")
-            continue
-        action = ad.action
-        if action is None:
-            print("has no action")
-            continue
+    if Test == 'True':
+        f.write('  <ObjPath type="array">\n')
 
-        # fcurves have a datapath and an index.
-        datapaths = ["location"]
-        for dp in datapaths:
-            for i, axis in enumerate("xyz"):
-                # find the fcurve with datapath and index req'd
-                fcurve = action.fcurves.find(dp, i)
-                if fcurve:
-                    print("%s.%c" % (dp, axis))
-                    Xkeys = [(kfp.co.x, fcurve.evaluate(kfp.co.x)) for kfp in fcurve.keyframe_points]
-                    # keys as a list of (frame, value) pairs.
-                else:
-                    print("No %s.%c fcurve" % (dp, axis))
- 
- 
-    def get_keyframes(obj_list):
-        keyframes = []
-        for obj in obj_list:
-            anim = obj.animation_data
-            if anim is not None and anim.action is not None:
-                for fcu in anim.action.fcurves:
-                    for keyframe in fcu.keyframe_points:
-                        x, y = keyframe.co
-                        if x not in keyframes:
-                            keyframes.append((math.ceil(x)))
-        return keyframes
+        for obj in OBJPathEnabled:
+            selectedObjectsPath  =  [key for key in keys]
+                #These are for normals
+    			
+            LASTFRAME = keys[-1]
+    	
+            f.write('    <value IsClosed="false" PtNum="' + str(LASTFRAME) + '" SplitWidth="0.5f" UnitIdNum="6">')
+            f.write('\n      <ObjPt type="path">')
+    		
+            
+    		
+    		#These need to be written for every frame between keyframes
 
- 
-    selection = bpy.context.selected_objects
-    keys = get_keyframes(selection)
- 
+            sce = bpy.context.scene
+            ob = bpy.context.object
+            my_frames = get_keyframes(selection)
+    	
+    	
+            def print_details(obj_list):
+                obj = bpy.context.active_object
+                context = bpy.context
 
-	
-	
-	
-	
-	
+                mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
+
+                mat = mat_rot.to_4x4() #Lets turn this into a grid!
+                
+
+                #These are for normals
+    			
+                matXRN = mat[2][0] #Write second row, first column
+                matYRN = mat[2][1] #Write second row, second column
+                matZRN = mat[2][2] #Write second row, third column
+    		
+                matXN = round(matXRN, 3)
+                matYN = round(matYRN, 3)
+                matZN = round(matZRN, 3)
+    			
+                XRot = round(obj_list.rotation_euler.x)
+                ZRot = round(obj_list.rotation_euler.z)
+                YRot = round(-obj_list.rotation_euler.y)
+                xloc = round(obj_list.location.x, 2)
+                yloc = round(-obj_list.location.y, 2)
+                zloc = round(obj_list.location.z, 2)			
+                f.write('\n        <point x="' + str(xloc) + 'f" y="' + str(zloc) + 'f" z="' + str(yloc) + 'f" nx="' + str(matXN) + 'f" ny="' + str(matZN) + 'f" nz="' + str(matYN) + 'f" val="0" />')
+    		
+    		
+    		
+
+            for key in range(my_frames[0], my_frames[len(my_frames)-1]+1):
+                bpy.context.scene.frame_set(key)
+                for obj in selection:
+                    print_details(obj)
+
+    		
+    		
+    		
+            f.write('\n        </ObjPt>')
+            f.write('\n      <PathPt type="array">\n')
+    		
+    		#These write for every keyframe instead!
+    		
+            for key in get_keyframes(selection):
+                bpy.context.scene.frame_set(key)
+                f.write('        <value Index="')
+                f.write(str(key)) #Writes index for the flag
+                f.write('" prm1="0f" prm2="0f">')
+    			
+
+    			
+                XRot = round(obj.rotation_euler.x, 3)
+                ZRot = round(obj.rotation_euler.z, 3)
+                YRot = round(-obj.rotation_euler.y,3)
+                xloc = round(obj.location.x, 3)
+                yloc = round(-obj.location.y, 3)
+                zloc = round(obj.location.z, 3)
+
+    	
+    		
+     
+                # Write Coordinates from item paths selected
+                f.write('\n          <Rotate X="')
+                f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+                f.write('\n          <Translate X="')
+                f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+                f.write('\n        </value>\n')
+     
+     
+            f.write('      </PathPt>')
+            f.write('\n    </value>\n')
+        f.write('  </ObjPath>\n')
 
 
-			
-			
-	
-	
-    f.close()
- 
-    return {'FINISHED'}
-
-
-
-
-
-
-	
-			
-			
 
     # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
  
@@ -1278,7 +1327,7 @@ def write_some_data(context, filepath, use_some_setting):
         # Write the start of replay path group
 		
         if layerIndex == layerIndecies[0]:
-            f.write('\n  <ReplayCamera type="array">\n')
+            f.write('  <ReplayCamera type="array">\n')
 		
  
         for objID, obj in enumerate(selectedObjects):
@@ -1306,8 +1355,6 @@ def write_some_data(context, filepath, use_some_setting):
 
  
         f.write('  </ReplayCamera>\n')	
-			
-			
 
 	
     f.close()
