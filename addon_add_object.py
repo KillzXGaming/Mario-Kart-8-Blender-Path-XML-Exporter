@@ -120,55 +120,55 @@ def ToggleHideGlide(self, context):
 def initprop():
 
 
-    GroupConnection1 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection2 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection3 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection4 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection5 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection6 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection7 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
-    GroupConnection8 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection1 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection2 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection3 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection4 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection5 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection6 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection7 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
+    bpy.types.Object.GroupConnection8 = bpy.props.IntProperty(name="Connect to Group",min=0, max=300,default=0)
 
 
-    has_GroupConnection1 = bpy.props.BoolProperty(name="Group Connect 1",default=False,subtype='NONE',)
+    bpy.types.Object.has_GroupConnection1 = bpy.props.BoolProperty(name="Group Connect 1",default=False,subtype='NONE',)
 		
-    has_GroupConnection2 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection2 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
         subtype='NONE',)
 		
-    has_GroupConnection3 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection3 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
         subtype='NONE',)
 		
-    has_GroupConnection4 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection4 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
         subtype='NONE',)
 		
-    has_GroupConnection5 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection5 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
         subtype='NONE',)
 		
-    has_GroupConnection6 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection6 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
         subtype='NONE',)
 		
-    has_GroupConnection7 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection7 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
         subtype='NONE',)
 		
-    has_GroupConnection8 = bpy.props.BoolProperty(
+    bpy.types.Object.has_GroupConnection8 = bpy.props.BoolProperty(
         name="Group Connect 1", 
         description="", 
         default=False, 
@@ -1366,7 +1366,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
-	
-	
-

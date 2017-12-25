@@ -17,20 +17,17 @@ def write_some_data(context, filepath, use_some_setting):
  
     Scene = bpy.context.scene  
     
-	
     if use_some_setting.NOLOOP == True:	
-        print("Property Enabled")
+        print("Paths will not loop!")
     else:
-        print("Property Disabled")
+        print("Paths will loop!")
 	
-    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
- 
-    # So now we will search for layers in the scene and group them!
+
+
     layerIndecies = []
         
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
     
-
 	
     def Coordinates():
         if obj.type != 'EMPTY': 
@@ -108,23 +105,11 @@ def write_some_data(context, filepath, use_some_setting):
 				
 				
 				#Todo range these values
+				
         if obj.has_GroupConnection1 == True:
-            f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection2 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection2) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection3 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection3) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection4 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection4) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection5 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection5) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection6 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection6) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection7 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection7) + '"PtId="0" />\n')  # write the next group ID
-            if obj.has_GroupConnection8 == True:
-                f.write('            <value PathId="' + str(obj.GroupConnection8) + '"PtId="0" />\n')  # write the next group ID	
-					
+            PathIDsOverride()
+
+	
         else:
             f.write('            <value PathId="')  # write the next group ID
 
@@ -148,13 +133,8 @@ def write_some_data(context, filepath, use_some_setting):
 
         # Write previous lap path group ID
 				
-				#If the previous group specifices the group ID, use that group's index
-        # if groupIndex == groupIndex[str(obj.GroupConnection1)]:
-            # f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
-
-
 				
-				
+
         f.write('          <PrevPt type="array">\n')
         f.write('            <value PathId="')  # write the next group ID
 				
@@ -177,7 +157,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n          </PrevPt>')
 	
     def NoLoopPathPTIDS():
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
              f.write('          <NextPt type="array" />\n')
         else:
             f.write('          <NextPt type="array">\n')
@@ -187,7 +167,7 @@ def write_some_data(context, filepath, use_some_setting):
         else:
                 f.write('            <value PathId="')  # write the next group ID
                             
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             if layerIndex == layerIndecies[-1]:
                 f.write('')
             else:
@@ -195,27 +175,27 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('%d' % groupIndex)
  
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
                 f.write('')
                                     
         # Write next lap path ID
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             f.write('')  # Last Object does not loop so has no ID after
         else:
             f.write('" PtId="')
  
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             f.write('')
         else:
             f.write('%d" />' % (objID + 1))
  
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             f.write('')  # Last Object does not loop so has no ID after
         else:
             f.write('\n          </NextPt>\n')
  
         # Write previous lap path group ID
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
                 f.write('          <PrevPt type="array" />')
         else:
                 f.write('          <PrevPt type="array">')
@@ -225,29 +205,62 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('\n            <value PathId="')  # write the next group ID
  
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
                 f.write('')
         else:
             f.write('%d' % groupIndex)
  
         # Write previous lap path ID
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
             f.write('" PtId="')
  
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
             f.write('')
         else:
             f.write('%d" />' % (objID - 1))
                             
                             
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
              f.write('\n          </PrevPt>')
  
- 
+    def PathIDsOverride():
+        if obj == selectedObjects[-1]:		
+            f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
+
+			
+			
+	     #If the previous group specifices the group ID, use that group's index
+
+			
+			
+        if layerIndex == layerIndecies[2]:
+            CustomsOIPL = [ob for ob in objects if ob.layers[layerIndecies[obj.GroupConnection2 - 1]] and  "lap" in ob.name.lower() and ob.select]
+            f.write('')
+            f.write('          <PrevPt type="array">\n')
+            f.write('            <value PathId="')  # write the next group ID
+    				
+            if obj == selectedObjects[0]:
+                if layerIndex == layerIndecies[0]:
+                    f.write('%d' %  (len(layerIndecies) - 1))
+                else:
+                    f.write('%d' % (groupIndex - 1))
+            else:
+                f.write('%d' % groupIndex)		
+		
+        # Write previous lap path ID		
+		
+            f.write('" PtId="')
+
+            if obj == selectedObjects[0]:
+                    f.write('%d" />' % (len(CustomsOIPL) - 1))
+            else:
+                f.write('%d" />' % (objID - 1))
+
+            f.write('\n          </PrevPt>')
  
  #Enemy Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
@@ -294,17 +307,6 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('  </EnemyPath>\n')
  
  
- 
- 
- 
- 
- 
- 
- 
-    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
- 
-    # So now we will search for layers in the scene and group them!
- 
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
@@ -336,19 +338,7 @@ def write_some_data(context, filepath, use_some_setting):
  
         f.write('  </IntroCamera>\n')	
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
-    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
- 
-    # So now we will search for layers in the scene and group them!
- 
+
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
     layerIndecies = []
@@ -396,17 +386,7 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('    </value>\n')
             f.write('  </ItemPath>\n')
- 
- 
 
- 
-
- 
- 
- 
-    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
- 
-    # So now we will search for layers in the scene and group them!
  
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
@@ -505,16 +485,16 @@ def write_some_data(context, filepath, use_some_setting):
     layerIndecies = []
  #GCamera Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjectsGCamera  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
  
-        if selectedObjectsGCamera:
+        if selectedObjects:
             layerIndecies.append(layerIndex)
         
 
  
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjectsGCamera  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
  
         # Write the start of lap path group
 		
@@ -531,7 +511,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n    <value UnitIdNum="26">')
         f.write('\n      <PathPt type="array">\n')
  
-        for objID, obj in enumerate(selectedObjectsGCamera ):
+        for objID, obj in enumerate(selectedObjects ):
             f.write('        <value>\n')
 
             NoLoopPathPTIDS()
@@ -560,16 +540,16 @@ def write_some_data(context, filepath, use_some_setting):
     layerIndecies = []
  #Gravity paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjectsGravity  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
  
-        if selectedObjectsGravity:
+        if selectedObjects:
             layerIndecies.append(layerIndex)
         
 
  
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjectsGravity  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
  
         # Write the start of lap path group
 		
@@ -586,7 +566,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n    <value UnitIdNum="70">')
         f.write('\n      <PathPt type="array">\n')
  
-        for objID, obj in enumerate(selectedObjectsGravity ):
+        for objID, obj in enumerate(selectedObjects ):
             f.write('        <value CameraHeight="' + str(obj.IntCameraHeight) + '" GlideOnly="' + str(obj.GlideOnlyEnum) + '" Transform="' + str(obj.GTransformEnum) + '">\n')
 
             NoLoopPathPTIDS()
@@ -615,13 +595,13 @@ def write_some_data(context, filepath, use_some_setting):
     layerIndecies = []
  #Glider Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjectsGlider  = [ob for ob in objects if ob.layers[layerIndex] and  "glide" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "glide" in ob.name.lower() and ob.select]
  
-        if selectedObjectsGlider:
+        if selectedObjects:
             layerIndecies.append(layerIndex)
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjectsGlider  = [ob for ob in objects if ob.layers[layerIndex] and  "glide" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "glide" in ob.name.lower() and ob.select]
  
         # Write the start of lap path group
         if layerIndex == layerIndecies[0]:
@@ -634,10 +614,10 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n    <value GlideType="1" IsUp="true" UnitIdNum="0">')
         f.write('\n      <PathPt type="array">\n')
  
-        for objID, obj in enumerate(selectedObjectsGlider ):
+        for objID, obj in enumerate(selectedObjects ):
             f.write('        <value Cannon="' + str(obj.CannonEnum) + '">\n')
 
-            if obj == selectedObjectsGlider [-1]:
+            if obj == selectedObjects [-1]:
                     f.write('          <NextPt type="array" />\n')
             else:
                     f.write('          <NextPt type="array">\n')
@@ -804,6 +784,8 @@ def write_some_data(context, filepath, use_some_setting):
  
     return {'FINISHED'}
  
+ 
+
  
 # ExportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
