@@ -96,6 +96,8 @@ def write_some_data(context, filepath, use_some_setting):
 
     def LoopedPathPTIDS():
 
+	
+	
         f.write('          <NextPt type="array">\n')
 
         var = range(0, 9)
@@ -106,36 +108,32 @@ def write_some_data(context, filepath, use_some_setting):
 				
 				#Todo range these values
 				
-        if obj.has_GroupConnection1 == True:
-            PathIDsOverride()
+        f.write('            <value PathId="')  # write the next group ID
 
-	
+        if obj == selectedObjects[-1]:
+            if layerIndex == layerIndecies[-1]:
+                f.write('0')
+            else:
+                f.write('%d' % (groupIndex + 1))
         else:
-            f.write('            <value PathId="')  # write the next group ID
+            f.write('%d' % groupIndex)
 
-            if obj == selectedObjects[-1]:
-                if layerIndex == layerIndecies[-1]:
-                    f.write('0')
-                else:
-                    f.write('%d' % (groupIndex + 1))
-            else:
-                f.write('%d' % groupIndex)
+    # Write next lap path ID
+        f.write('" PtId="')
 
-        # Write next lap path ID
-            f.write('" PtId="')
+        if obj == selectedObjects[-1]:
+            f.write('0" />\n')
+        else:
+            f.write('%d" />\n' % (objID + 1))
 
-            if obj == selectedObjects[-1]:
-                f.write('0" />\n')
-            else:
-                f.write('%d" />\n' % (objID + 1))
+        f.write('          </NextPt>\n')
 
-            f.write('          </NextPt>\n')
-
-        # Write previous lap path group ID
+    # Write previous lap path group ID
 				
 				
-
+	     #If the previous group specifices the group ID, use that group's index
         f.write('          <PrevPt type="array">\n')
+
         f.write('            <value PathId="')  # write the next group ID
 				
         if obj == selectedObjects[0]:
@@ -228,39 +226,7 @@ def write_some_data(context, filepath, use_some_setting):
              f.write('\n          </PrevPt>')
  
     def PathIDsOverride():
-        if obj == selectedObjects[-1]:		
-            f.write('            <value PathId="' + str(obj.GroupConnection1) + '"PtId="0" />\n')  # write the next group ID
-
-			
-			
-	     #If the previous group specifices the group ID, use that group's index
-
-			
-			
-        if layerIndex == layerIndecies[2]:
-            CustomsOIPL = [ob for ob in objects if ob.layers[layerIndecies[obj.GroupConnection2 - 1]] and  "lap" in ob.name.lower() and ob.select]
-            f.write('')
-            f.write('          <PrevPt type="array">\n')
-            f.write('            <value PathId="')  # write the next group ID
-    				
-            if obj == selectedObjects[0]:
-                if layerIndex == layerIndecies[0]:
-                    f.write('%d' %  (len(layerIndecies) - 1))
-                else:
-                    f.write('%d' % (groupIndex - 1))
-            else:
-                f.write('%d' % groupIndex)		
-		
-        # Write previous lap path ID		
-		
-            f.write('" PtId="')
-
-            if obj == selectedObjects[0]:
-                    f.write('%d" />' % (len(CustomsOIPL) - 1))
-            else:
-                f.write('%d" />' % (objID - 1))
-
-            f.write('\n          </PrevPt>')
+        print("")
  
  #Enemy Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
