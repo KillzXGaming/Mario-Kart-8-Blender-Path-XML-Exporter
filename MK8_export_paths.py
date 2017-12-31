@@ -155,17 +155,19 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n          </PrevPt>')
 	
     def NoLoopPathPTIDS():
-        if obj == selectedObjects[-1]:
-             f.write('          <NextPt type="array" />\n')
+        if obj == selectedObjects [-1]:
+                f.write('          <NextPt type="array" />\n')
         else:
-            f.write('          <NextPt type="array">\n')
+                f.write('          <NextPt type="array">\n')
 
+ 
+        # Write next lap path group ID
         if obj == selectedObjects [-1]:
                 f.write('')  # Last Object does not loop so has no ID after
         else:
                 f.write('            <value PathId="')  # write the next group ID
-                            
-        if obj == selectedObjects[-1]:
+				
+        if obj == selectedObjects [-1]:
             if layerIndex == layerIndecies[-1]:
                 f.write('')
             else:
@@ -173,54 +175,54 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('%d' % groupIndex)
  
-        if obj == selectedObjects[-1]:
+        if obj == selectedObjects [-1]:
                 f.write('')
-                                    
+					
         # Write next lap path ID
-        if obj == selectedObjects[-1]:
+        if obj == selectedObjects [-1]:
             f.write('')  # Last Object does not loop so has no ID after
         else:
             f.write('" PtId="')
  
-        if obj == selectedObjects[-1]:
+        if obj == selectedObjects [-1]:
             f.write('')
         else:
             f.write('%d" />' % (objID + 1))
  
-        if obj == selectedObjects[-1]:
+        if obj == selectedObjects [-1]:
             f.write('')  # Last Object does not loop so has no ID after
         else:
             f.write('\n          </NextPt>\n')
  
         # Write previous lap path group ID
-        if obj == selectedObjects[0]:
+        if obj == selectedObjects [0]:
                 f.write('          <PrevPt type="array" />')
         else:
                 f.write('          <PrevPt type="array">')
-                    
+			
         if obj == selectedObjects [0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
             f.write('\n            <value PathId="')  # write the next group ID
  
-        if obj == selectedObjects[0]:
+        if obj == selectedObjects [0]:
                 f.write('')
         else:
             f.write('%d' % groupIndex)
  
         # Write previous lap path ID
-        if obj == selectedObjects[0]:
+        if obj == selectedObjects [0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
             f.write('" PtId="')
  
-        if obj == selectedObjects[0]:
+        if obj == selectedObjects [0]:
             f.write('')
         else:
             f.write('%d" />' % (objID - 1))
-                            
-                            
-        if obj == selectedObjects[0]:
+				
+				
+        if obj == selectedObjects [0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
              f.write('\n          </PrevPt>')
@@ -582,11 +584,6 @@ def write_some_data(context, filepath, use_some_setting):
  
         for objID, obj in enumerate(selectedObjects ):
             f.write('        <value Cannon="' + str(obj.CannonEnum) + '">\n')
-
-            if obj == selectedObjects [-1]:
-                    f.write('          <NextPt type="array" />\n')
-            else:
-                    f.write('          <NextPt type="array">\n')
 
             NoLoopPathPTIDS()
             
