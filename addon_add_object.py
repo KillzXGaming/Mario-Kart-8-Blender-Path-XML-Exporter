@@ -303,6 +303,17 @@ def initprop():
                 ('true', "Headlights On", ""),
                ]
         )
+		
+    bpy.types.Object.PathTypes = EnumProperty(
+        name="",
+        description="Set path type",
+        items=[ ('0', "None", ""),
+                ('1', "Intro Camera", ""),
+                ('2', "Replay Camera", ""),
+
+               ]
+        )
+		
 	#props of gravity path flags
 
     bpy.types.Object.IntCameraHeight = bpy.props.IntProperty(
@@ -576,6 +587,7 @@ def delprop():
     del bpy.types.Scene.StringPropIntro
     del bpy.types.Scene.BoolReplay
     del bpy.types.Scene.StringPropReplay
+    del bpy.types.bpy.types.Object.PathTypes
 	#Deletion of lap path flags
     del bpy.types.bpy.types.Object.HeadlightsEnum
     del bpy.types.Object.IntCheckpoint
@@ -851,26 +863,6 @@ class ObjectPanel(bpy.types.Panel):
         if context.object.name.startswith("Lap"):
             obj = context.object
             box = layout.box()
-            row = box.row()
-
-            row.prop(obj, "expanded",text="Groups Connected",icon="TRIA_DOWN" if obj.expanded else "TRIA_RIGHT",icon_only=True, emboss=False)
-
-			
-            if obj.expanded:
-                row = box.row()
-				
-                self._optional_prop(obj, row, "GroupConnection1")
-                self._optional_prop(obj, row, "GroupConnection2")
-                row = box.row()
-                self._optional_prop(obj, row, "GroupConnection3")
-                self._optional_prop(obj, row, "GroupConnection4")
-                row = box.row()
-                self._optional_prop(obj, row, "GroupConnection5")
-                self._optional_prop(obj, row, "GroupConnection6")
-                row = box.row()
-                self._optional_prop(obj, row, "GroupConnection7")
-                self._optional_prop(obj, row, "GroupConnection8")
-                row = box.row()
 
             row = box.row()
             split = row.split(align=True)
@@ -884,7 +876,8 @@ class ObjectPanel(bpy.types.Panel):
             col.prop(obj, "IntMapCameraY")
             col.prop(obj, "IntMapCameraFovy")
             col.prop(obj, "IntClipIndx")
-            
+        if context.object.type == 'CURVE':
+            col.prop(obj, "PathTypes")
 
 
 
@@ -983,10 +976,6 @@ class VIEW3D_PT_Blank1_Blank2(Panel):
         row = layout.row()
         row.scale_y = 1.5
         row.operator("replay.select" , text="Select Replay Camera Paths")
-        row = layout.row()
-        row.scale_y = 1.5
-        row.operator("lap.gravity" , text="Lap2Gravity")
-        row.operator("lap.lapdebug" , text="Lap2LapDEBUG")
         row = layout.row()
        # row.operator("object.lamp_add(type='HEMI'), text="Add Hemisphere")
         row = layout.row()

@@ -58,6 +58,34 @@ def write_some_data(context, filepath, use_some_setting):
         f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
         f.write('\n        </value>\n')
 
+		
+    def NoScaleCoordinates():
+        if obj.type != 'EMPTY': 
+             ScaleX = obj.scale.x * 2
+             ScaleY = obj.scale.y * 2
+             ScaleZ = obj.scale.z * 2
+        else:
+            ScaleX = obj.scale.x
+            ScaleY = obj.scale.y
+            ScaleZ = obj.scale.z
+ 
+        zscale = round(ScaleZ, 3)
+        yscale = round(ScaleX, 3)
+        xscale = round(ScaleX, 3)
+        XRot = round(obj.rotation_euler.x, 3)
+        ZRot = round(obj.rotation_euler.z, 3)
+        YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+        xloc = round(obj.location.x, 3)
+        yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+        zloc = round(obj.location.z, 3)
+ 
+        # Write Coordinates from lap paths selected
+        f.write('\n          <Rotate X="')
+        f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+        f.write('\n          <Translate X="')
+        f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+        f.write('\n        </value>\n')
+		
     def ReturnCoordinates():
         mat_rot = obj.rotation_euler.to_matrix() #matricies will write based on euler rotation!
 
@@ -155,19 +183,17 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n          </PrevPt>')
 	
     def NoLoopPathPTIDS():
-        if obj == selectedObjects [-1]:
-                f.write('          <NextPt type="array" />\n')
+        if obj == selectedObjects[-1]:
+             f.write('          <NextPt type="array" />\n')
         else:
-                f.write('          <NextPt type="array">\n')
+            f.write('          <NextPt type="array">\n')
 
- 
-        # Write next lap path group ID
         if obj == selectedObjects [-1]:
                 f.write('')  # Last Object does not loop so has no ID after
         else:
                 f.write('            <value PathId="')  # write the next group ID
-				
-        if obj == selectedObjects [-1]:
+                            
+        if obj == selectedObjects[-1]:
             if layerIndex == layerIndecies[-1]:
                 f.write('')
             else:
@@ -175,60 +201,67 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('%d' % groupIndex)
  
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
                 f.write('')
-					
+                                    
         # Write next lap path ID
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             f.write('')  # Last Object does not loop so has no ID after
         else:
             f.write('" PtId="')
  
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             f.write('')
         else:
             f.write('%d" />' % (objID + 1))
  
-        if obj == selectedObjects [-1]:
+        if obj == selectedObjects[-1]:
             f.write('')  # Last Object does not loop so has no ID after
         else:
             f.write('\n          </NextPt>\n')
  
         # Write previous lap path group ID
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
                 f.write('          <PrevPt type="array" />')
         else:
                 f.write('          <PrevPt type="array">')
-			
+                    
         if obj == selectedObjects [0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
             f.write('\n            <value PathId="')  # write the next group ID
  
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
                 f.write('')
         else:
             f.write('%d' % groupIndex)
  
         # Write previous lap path ID
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
             f.write('" PtId="')
  
-        if obj == selectedObjects [0]:
+        if obj == selectedObjects[0]:
             f.write('')
         else:
             f.write('%d" />' % (objID - 1))
-				
-				
-        if obj == selectedObjects [0]:
+                            
+                            
+        if obj == selectedObjects[0]:
             f.write('')  # Last Object does not loop so has no ID before
         else:
              f.write('\n          </PrevPt>')
  
+ 
+    #Unused for now :(
     def PathIDsOverride():
         print("")
+ 
+ 
+    layerIndecies = []
+ 
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
  #Enemy Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
@@ -261,7 +294,7 @@ def write_some_data(context, filepath, use_some_setting):
                 NoLoopPathPTIDS()
             
             #Write Coordinates for Translation, and Rotation
-            Coordinates()
+            NoScaleCoordinates()
 
  
         f.write('      </PathPt>\n')
@@ -273,38 +306,6 @@ def write_some_data(context, filepath, use_some_setting):
         else:
             f.write('    </value>\n')
             f.write('  </EnemyPath>\n')
- 
- 
-    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
- 
-    layerIndecies = []
- #Intro Paths
-    for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "intro" in ob.name.lower() and ob.select]
- 
-        if selectedObjects:
-            layerIndecies.append(layerIndex)
- 
-    for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
-        sOIPL = [ob for ob in objects if ob.layers[layerIndecies[groupIndex - 1]] and  "lap" in ob.name.lower() and ob.select]
-
-        # Write the start of intro path group
-		
-        if layerIndex == layerIndecies[0]:
-            f.write('  <IntroCamera type="array">\n')
-		
- 
-        for objID, obj in enumerate(selectedObjects):
-            f.write('    <value CameraNum="' + str(obj.IntCameraNumIntro) + '" CameraTime="' + str(obj.IntCameraTimeIntro) + '" CameraType="' + str(obj.FollowCameraTypeIntro) + '" Camera_AtPath="' + str(obj.IntCamera_AtPathIntro) + '" Camera_Path="' + str(obj.IntCamera_PathIntro) + '" Fovy="' + str(obj.IntFovyIntro) + '" Fovy2="' + str(obj.IntFovy2Intro) + '" FovySpeed="' + str(obj.IntFovySpeedIntro) + '" UnitIdNum="' + str(obj.IntUnitIdNumIntro) + '">')
-			
-            
-            #Write Coordinates for Scale, Translation, and Rotation
-            Coordinates()
- 
-
- 
-        f.write('  </IntroCamera>\n')	
  
 
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
@@ -343,7 +344,7 @@ def write_some_data(context, filepath, use_some_setting):
                 NoLoopPathPTIDS()
             
             #Write Coordinates for Translation, and Rotation
-            Coordinates()
+            NoScaleCoordinates()
  
         f.write('      </PathPt>\n')
  
@@ -355,6 +356,30 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('    </value>\n')
             f.write('  </ItemPath>\n')
 
+ 
+ #Intro Paths
+    selectedCurveObjects  = [ob for ob in objects if ob.select and ob.type == 'CURVE']
+		
+    if selectedCurveObjects:
+        f.write('  <IntroCamera type="array">\n')
+    for i, obj in enumerate(selectedCurveObjects): 
+
+        # Write the start of intro path group
+        print("Test = " + str (obj.PathTypes))
+
+        if str(obj.PathTypes) == str(1):
+             f.write('    <value CameraNum="' + str(obj.IntCameraNumIntro) + '" CameraTime="' + str(obj.IntCameraTimeIntro) + '" CameraType="' + str(obj.FollowCameraTypeIntro) + '" Camera_AtPath="' + str(obj.IntCamera_AtPathIntro) + '" Camera_Path="' + str(i) + '" Fovy="' + str(obj.IntFovyIntro) + '" Fovy2="' + str(obj.IntFovy2Intro) + '" FovySpeed="' + str(obj.IntFovySpeedIntro) + '" UnitIdNum="' + str(obj.IntUnitIdNumIntro) + '">')
+			
+             Coordinates()
+    if selectedCurveObjects:
+
+        f.write('  </IntroCamera>\n')	
+	
+	
+ 
+    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
+ 
+    layerIndecies = []
  
     objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
  
@@ -453,7 +478,7 @@ def write_some_data(context, filepath, use_some_setting):
     layerIndecies = []
  #GCamera Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
  
         if selectedObjects:
             layerIndecies.append(layerIndex)
@@ -462,7 +487,7 @@ def write_some_data(context, filepath, use_some_setting):
  
  
     for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "gravity" in ob.name.lower() and ob.select]
+        selectedObjects  = [ob for ob in objects if ob.layers[layerIndex] and  "lap" in ob.name.lower() and ob.select]
  
         # Write the start of lap path group
 		
@@ -594,6 +619,7 @@ def write_some_data(context, filepath, use_some_setting):
         if layerIndex != layerIndecies[-1]:
             f.write('')
         else:
+            f.write('      </PathPt>\n')
             f.write('    </value>\n')
             f.write('  </GlidePath>\n')
 
@@ -707,42 +733,68 @@ def write_some_data(context, filepath, use_some_setting):
             f.write('\n    </value>\n')
         f.write('  </ObjPath>\n')
 
+#Paths
+	
+    if selectedCurveObjects:
+        f.write('  <Path type="array">\n')
+    for i, ob in enumerate(selectedCurveObjects): 
+      
+        f.write('    <value Delete="false" IsClosed="false" RailType="0" UnitIdNum="131114">') 
+        f.write('  <!-- Path ' + str(i) + ' ' + str(ob.name) +' --> \n')
+        f.write('      <PathPt type="array">\n')
+        for spline in ob.data.splines :
 
+          if len(spline.bezier_points) > 0 :
+            for bezier_point in spline.bezier_points.values() : #Beizer curves have control points
+              handle_left  = ob.matrix_world * bezier_point.handle_left
+              co           = ob.matrix_world * bezier_point.co
+              handle_right = ob.matrix_world * bezier_point.handle_right 
+              f.write('        <value prm1="0f" prm2="0f">\n')
+              f.write('          <ControlPoints type="array">\n')
+              f.write('            <value X ="%.5ff" Y ="%.5ff" Z ="%.5ff" />\n' % (handle_left.x, handle_left.z, -handle_left.y ))
+              f.write('            <value X ="%.5ff" Y ="%.5ff" Z ="%.5ff" />\n' % (handle_right.x, handle_right.z, -handle_right.y ))
+              f.write('          </ControlPoints>\n')
+              mat_rot = ob.rotation_euler.to_matrix() #matricies will write based on euler rotation!
+              mat = mat_rot.to_4x4() #Lets turn this into a grid!
+              matXRN = mat[1][0] #Write second row, first column
+              matYRN = mat[1][1] #Write second row, second column
+              matZRN = mat[1][2] #Write second row, third column
+              f.write('          <Translate X ="%.5ff" Y ="%.5ff" Z ="%.5ff"  />\n' % (co.x, co.z, -co.y ))
+              f.write('        </value>\n') 
+          if len(spline.points) > 0 :
+            for point in spline.points.values() : #For nurbs Curve
+              co = ob.matrix_world * point.co
+              f.write('        <value prm1="0f" prm2="0f">\n')
+              f.write('          <Translate X ="%.5ff" Y ="%.5ff" Z ="%.5ff"  />\n' % (co.x, co.z, -co.y ))
+              f.write('        </value>\n') 
+        f.write('      </PathPt>\n')
+        f.write('    </value>\n')
+    if selectedCurveObjects:
+        f.write('  </Path>\n')
 
-    # Add Extra Code here for Multiple Paths. Lap path IDs will reset for these.
  
-    # So now we will search for layers in the scene and group them!
- 
-    objects = sorted(bpy.context.scene.objects, key=lambda ob: ob.name)
- 
-    layerIndecies = []
+
  #Replay Paths
     for layerIndex in range(20):  # loop from layer 0 to layer 19
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "replay" in ob.name.lower() and ob.select]
- 
-        if selectedObjects:
-            layerIndecies.append(layerIndex)
- 
-    for groupIndex, layerIndex in enumerate(layerIndecies):  # loop from first group to last group
-        selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and ob.select]
+         selectedObjects = [ob for ob in objects if ob.layers[layerIndex] and  "replay" and ob.select]
+         if selectedObjects:
+             layerIndecies.append(layerIndex)
+			
+    if selectedObjects:
+        f.write('  <ReplayCamera type="array">\n')
+		 
+    for i, ob in enumerate(selectedObjects): 
  
         # Write the start of replay path group
 		
-        if layerIndex == layerIndecies[0]:
-            f.write('  <ReplayCamera type="array">\n')
-		
- 
-        for objID, obj in enumerate(selectedObjects):
-            f.write('    <value AngleX="' + str(obj.IntAngleXReplay) + '" AngleY="' + str(obj.IntAngleYReplay) + '" AutoFovy="' + str(obj.AutoFovyEnumReplay) + '" CameraType="' + str(obj.CameraTypeEnumReplay) + '" Camera_Path="' + str(obj.IntCamera_PathReplay) + '" DepthOfField="' + str(obj.IntDepthOfFieldReplay) + '" Distance="' + str(obj.IntDistanceReplay) + '" Follow="' + str(obj.FollowEnumReplay) + '" Fovy="' + str(obj.IntFovyReplay) + '" Fovy2="' + str(obj.IntFovy2Replay) + '" FovySpeed="' + str(obj.IntFovySpeedReplay) + '" Group="' + str(obj.IntGroupReplay) + '" Pitch="' + str(obj.IntPitchReplay) + '" Roll="' + str(obj.IntRollReplay) + '" UnitIdNum="' + str(obj.IntUnitIdNumReplay) + '" Yaw="' + str(obj.IntYawReplay) + '" prm1="' + str(obj.Intprm1Replay) + '" prm2="' + str(obj.Intprm2Replay) + '">')
+        f.write('    <value AngleX="' + str(obj.IntAngleXReplay) + '" AngleY="' + str(obj.IntAngleYReplay) + '" AutoFovy="' + str(obj.AutoFovyEnumReplay) + '" CameraType="' + str(obj.CameraTypeEnumReplay) + '" Camera_Path="' + str(obj.IntCamera_PathReplay) + '" DepthOfField="' + str(obj.IntDepthOfFieldReplay) + '" Distance="' + str(obj.IntDistanceReplay) + '" Follow="' + str(obj.FollowEnumReplay) + '" Fovy="' + str(obj.IntFovyReplay) + '" Fovy2="' + str(obj.IntFovy2Replay) + '" FovySpeed="' + str(obj.IntFovySpeedReplay) + '" Group="' + str(obj.IntGroupReplay) + '" Pitch="' + str(obj.IntPitchReplay) + '" Roll="' + str(obj.IntRollReplay) + '" UnitIdNum="' + str(obj.IntUnitIdNumReplay) + '" Yaw="' + str(obj.IntYawReplay) + '" prm1="' + str(obj.Intprm1Replay) + '" prm2="' + str(obj.Intprm2Replay) + '">')
             
             #Write Coordinates for Scale, Translation, and Rotation
-            Coordinates()
+        Coordinates()
  
-
- 
+    if selectedObjects:
         f.write('  </ReplayCamera>\n')	
 
-	
     f.close()
  
     return {'FINISHED'}
