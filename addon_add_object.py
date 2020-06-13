@@ -977,6 +977,9 @@ class VIEW3D_PT_Blank1_Blank2(Panel):
         row.scale_y = 1.5
         row.operator("replay.select" , text="Select Replay Camera Paths")
         row = layout.row()
+        row.operator("lap.gravity" , text="Lap 2 Gravity")
+        row.scale_y = 1.5
+        row = layout.row()
        # row.operator("object.lamp_add(type='HEMI'), text="Add Hemisphere")
         row = layout.row()
         col = layout.column(align=True)
