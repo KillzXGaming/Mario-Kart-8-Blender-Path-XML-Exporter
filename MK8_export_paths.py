@@ -51,7 +51,7 @@ def write_some_data(context, filepath, use_some_setting):
  
         # Write Coordinates from lap paths selected
         f.write('\n          <Rotate X="')
-        f.write(str(XRot) + 'f" Y="' + str(ZRot) + 'f" Z="' + str(YRot) + 'f" />')
+        f.write(str(XRot) + 'f" Y="' + str(YRot) + 'f" Z="' + str(ZRot) + 'f" />')
         f.write('\n          <Scale X="')
         f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
         f.write('\n          <Translate X="')
