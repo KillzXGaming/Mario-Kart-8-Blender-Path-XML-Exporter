@@ -40,14 +40,14 @@ def write_some_data(context, filepath, use_some_setting):
             ScaleZ = obj.scale.z
  
         zscale = round(ScaleZ, 3)
-        yscale = round(ScaleX, 3)
+        yscale = round(ScaleY, 3)
         xscale = round(ScaleX, 3)
         XRot = round(obj.rotation_euler.x, 3)
-        ZRot = round(obj.rotation_euler.z, 3)
-        YRot = round(-obj.rotation_euler.y,3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
+        YRot = round(-obj.rotation_euler.z,3)  # Invert the Y coords so positive is negitive, negitive is positive
+	ZRot = round(obj.rotation_euler.y, 3)
         xloc = round(obj.location.x, 3)
-        yloc = round(-obj.location.y, 3)  # Invert the dumb Y coords so positive is negitive, negitive is positive
-        zloc = round(obj.location.z, 3)
+        yloc = round(-obj.location.z, 3)  # Invert the Y coords so positive is negitive, negitive is positive
+        zloc = round(obj.location.y, 3)
  
         # Write Coordinates from lap paths selected
         f.write('\n          <Rotate X="')
@@ -55,7 +55,7 @@ def write_some_data(context, filepath, use_some_setting):
         f.write('\n          <Scale X="')
         f.write(str(xscale) + 'f" Y="' + str(zscale) + 'f" Z="0.0f" />')
         f.write('\n          <Translate X="')
-        f.write(str(xloc) + 'f" Y="' + str(zloc) + 'f" Z="' + str(yloc) + 'f" />')
+        f.write(str(xloc) + 'f" Y="' + str(yloc) + 'f" Z="' + str(zloc) + 'f" />')
         f.write('\n        </value>\n')
 
 		
